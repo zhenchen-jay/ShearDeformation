@@ -39,7 +39,8 @@ void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vect
     for(int i=0;i<3;i++)
     {
         dn[i] = nf.dot(W.row(i)) * 1.0 / A * e.cross(nf);
-        std::cout<<dn[i]<<std::endl;
+        //dn[i] = 1.0/A*(-W.row(i).cross(e)+(W.row(i).cross(e)).dot(nf)*nf.transpose());
+        //std::cout<<dn[i]<<std::endl;
     }
     
 }
@@ -112,8 +113,8 @@ void GeoFeature::test_face_normal()
     std::vector<Eigen::Vector3d> dn1;
     
     V << 1,0,0,
-    0,1,0,
-    0,0,1;
+    0,0.5,0,
+    0,0,2;
     
     U=V;
     
@@ -122,28 +123,29 @@ void GeoFeature::test_face_normal()
     
     for(int j=0;j<3;j++)
     {
+        face_normal(V.row(0), V.row(1), V.row(2), j, n, dn);
         for(int i=0;i<3;i++)
         {
             for(int k=3;k<7;k++)
             {
                 w(i) = pow(10,-k);
                 U(j,i) = V(j,i)+w(i);
-                face_normal(V.row(0), V.row(1), V.row(2), j, n, dn);
                 face_normal(U.row(0), U.row(1), U.row(2), j, n1, dn1);
                 Eigen::Vector3d diff_n = (n1-n) / w(i);
                 std::cout<<"The test vertex is V"<<j<<std::endl;
                 std::cout<<"The variable is the "<<i<<"th component"<<std::endl;
                 std::cout<<"Eplison is: "<<w(i)<<std::endl;
                 Eigen::Vector3d grad = (dn[0]*w(0)+dn[1]*w(1)+dn[2]*w(2))/w(i);
-                for(int l=0;l<3;l++)
+                for(int p=0;p<3;p++)
                 {
-                    std::cout<<"The "<<l<<"th component of the finite differecce is: "<<diff_n(l)<<std::endl;
-                    std::cout<<"The "<<l<<"th component of the gradient is: "<<grad(l)<<std::endl;
-                    std::cout<<"The difference is: "<<abs(diff_n(l)-grad(l))<<std::endl;
+                    std::cout<<"The "<<p<<"th component of the finite differecce is: "<<diff_n(p)<<std::endl;
+                    std::cout<<"The "<<p<<"th component of the gradient is: "<<grad(p)<<std::endl;
+                    std::cout<<"The difference is: "<<abs(diff_n(p)-grad(p))<<std::endl;
                     
                 }
             }
             w.setZero();
+            U=V;
         }
     }
     
