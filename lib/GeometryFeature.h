@@ -1,0 +1,60 @@
+//
+//  GeometryFeature.h
+//  ShearDeformation_bin
+//
+//  Created by Zhen Chen on 10/5/18.
+//
+
+#ifndef GeometryFeature_h
+#define GeometryFeature_h
+#include<Eigen/Dense>
+#include<vector>
+namespace GeoFeature
+{
+    void face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, int start_ind, Eigen::Vector3d &nf, std::vector<Eigen::Vector3d> &dn);
+    
+    /*
+     This function calculates the face normals and its derivative w.r.t the given vertex, which can be decided by the start_ind. That is, start_ind = i, then V = Vi
+     @param[in] {V0, V1, V2}: The vertices of the triangle.
+     @param[in] start_ind: The flag of variable V which belongs to {V0,V1,V2}, hat is, start_ind = i, then V = Vi.
+     
+     @param[out] nf: The face normal.
+     @param[out] dn: The derivative of this normal, w.r.t. the vertex decided by start_ind
+     
+     */
+    
+    
+    void calculate_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Matrix2d &I);
+    
+    /*
+     This function calculates the corresponding matrix of the first fundamental form with the parametric space span{(0,0),(1,0) (0,1)}
+     @param[in] {V0,V1,V2}: the vertices of the triangle
+     @param[out] I: the corresponding matrix of the first fundamental form
+     */
+    
+    void
+    diff_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, int start_ind, std::vector<Eigen::Matrix2d> &dI);
+    /*
+     This function calculates the derivative of the first fundamental form determined by V0,V1,V2 w.r.t. the vertex v_flag. In this function, we require that the flag belongs to {0,1,2}
+     @param[in] {V0,V1,V2}: The vertices of the triangle.
+     @param[in] start_ind: The flag of variable V which belongs to {V0,V1,V2}, hat is, start_ind = i, then V = Vi
+     @param[out] dI: The vector fo the derivative matrix wrt. x,y,z-coordinates.
+     */
+    
+    void calculate_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Vector3d n0, Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Matrix2d &II);
+    /*
+     This function calculates the corresponding matrix of the second fundamental form with the parametric space span{(0,0),(1,0) (0,1)}
+     @param[in] {V0,V1,V2}: the vertices of the triangle
+     @param[in] {n0,n1,n2}: the corresponding edge normal of the triangle
+     
+     @param[out] II: the corresponding matrix of the first fundamental form
+     */
+    
+    
+    
+    // Test functions which can be used to check whether the derivative is correct
+    
+    void test_face_normal();
+    
+}
+#endif /* GeometryFeature_h */

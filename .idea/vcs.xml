@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/libigl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/CoMISo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/cork" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/eigen" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/embree" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/imgui/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/pybind11" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/pybind11/tools/clang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/tetgen" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/tinyxml2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libigl/external/triangle" vcs="Git" />
+  </component>
+</project>
