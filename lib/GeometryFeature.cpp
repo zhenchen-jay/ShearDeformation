@@ -131,6 +131,7 @@ void GeoFeature::test_face_normal()
                 w(i) = pow(10,-k);
                 U(j,i) = V(j,i)+w(i);
                 face_normal(U.row(0), U.row(1), U.row(2), j, n1, dn1);
+                
                 Eigen::Vector3d diff_n = (n1-n) / w(i);
                 std::cout<<"The test vertex is V"<<j<<std::endl;
                 std::cout<<"The variable is the "<<i<<"th component"<<std::endl;
