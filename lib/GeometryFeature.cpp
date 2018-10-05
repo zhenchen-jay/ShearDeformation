@@ -39,8 +39,6 @@ void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vect
     for(int i=0;i<3;i++)
     {
         dn[i] = nf.dot(W.row(i)) * 1.0 / A * e.cross(nf);
-        //dn[i] = 1.0/A*(-W.row(i).cross(e)+(W.row(i).cross(e)).dot(nf)*nf.transpose());
-        //std::cout<<dn[i]<<std::endl;
     }
     
 }

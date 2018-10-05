@@ -30,7 +30,10 @@ add_library(lib
         GravityEnergy.h
         GravityEnergy.cpp
         GeometryFeature.h
-        GeometryFeature.cpp)
+        GeometryFeature.cpp
+        MeshConnection.h
+        MeshConnection.cpp
+        )
 
 set_target_properties(lib PROPERTIES CXX_STANDARD 14)
 set_target_properties(lib PROPERTIES CXX_STANDARD_REQUIRED ON)
