@@ -17,10 +17,10 @@ namespace MeshConnection
     This function calculates the adjacent faces of the face using the function in libigl 
     */
 
-   void edge_triangle_adjacency(Eigen::MatrixXd V, Eigen::MatrixXi F);
-   /*
-   This function calculates the adjacent faces of the edges in a given mesh(V,F)
-   */
+//   void edge_triangle_adjacency(Eigen::MatrixXd V, Eigen::MatrixXi F);
+//   /*
+//   This function calculates the adjacent faces of the edges in a given mesh(V,F)
+//   */
 
     
     

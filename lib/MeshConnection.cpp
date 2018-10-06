@@ -12,8 +12,8 @@ void MeshConnection::triangle_triangle_adjacency(Eigen::MatrixXi F, Eigen::Matri
     igl::triangle_triangle_adjacency(F,TT,TTi);
 }
 
-void MeshConnection::edge_triangle_adjacency(Eigen::MatrixXd V, Eigen::MatrixXi F)
-{
-    
-}
+//void MeshConnection::edge_triangle_adjacency(Eigen::MatrixXd V, Eigen::MatrixXi F)
+//{
+//
+//}
 

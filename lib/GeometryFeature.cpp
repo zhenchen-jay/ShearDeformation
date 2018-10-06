@@ -53,9 +53,9 @@ void GeoFeature::calculate_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vec
 
 void GeoFeature::diff_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, int start_ind,std::vector<Eigen::Matrix2d> &dI)
 {
-    if (start_ind != 0 && start_ind != 1 && start_ind != 2)
+    if (start_ind != 0 && start_ind != 1 && start_ind != 2 && start_ind != -1)
     {
-        std::cout << "The differential vertex should lie on the triangle" << std::endl;
+        std::cout << "The differential vertex should lie on the triangle or set start_ind as -1" << std::endl;
         return;
     }
     Eigen::Vector3d A11, A12, A21, A22;
@@ -65,18 +65,27 @@ void GeoFeature::diff_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d
         A12 = -(V1 + V2 - 2 * V0);
         A21 = -(V1 + V2 - 2 * V0);
         A22 = -2 * (V2 - V0);
-    } else if (start_ind == 1)
+    }
+    else if (start_ind == 1)
     {
         A11 = 2 * (V1 - V0);
         A12 = V2 - V0;
         A21 = V2 - V0;
         A22 << 0, 0, 0;
-    } else
+    }
+    else if (start_ind == 2)
     {
         A11 << 0, 0, 0;
         A12 = V1 - V0;
         A21 = V1 - V0;
         A22 = 2 * (V2 - V0);
+    }
+    else
+    {
+        A11 << 0, 0, 0;
+        A12 << 0, 0, 0;
+        A21 << 0, 0, 0;
+        A22 << 0, 0, 0;
     }
     dI.resize(3);
     for(int k=0;k<3;k++)
@@ -87,8 +96,17 @@ void GeoFeature::diff_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d
     
 }
 
-void GeoFeature::calculate_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Vector3d n0, Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Matrix2d &II)
+void GeoFeature::calculate_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Vector3d V_0, Eigen::Vector3d V_1, Eigen::Vector3d V_2, Eigen::Matrix2d &II)
 {
+    Eigen::Vector3d nf = ((V1-V0).cross(V2-V0)).normalized();
+    Eigen::Vector3d nf0 = ((V_0-V1).cross(V2-V1)).normalized();
+    Eigen::Vector3d nf1 = ((V_1-V2).cross(V0-V2)).normalized();
+    Eigen::Vector3d nf2 = ((V_2-V0).cross(V1-V0)).normalized();
+    
+    Eigen::Vector3d n0 = (nf+nf0).normalized();
+    Eigen::Vector3d n1 = (nf+nf1).normalized();
+    Eigen::Vector3d n2 = (nf+nf2).normalized();
+    
     II(0,0) = 2*(V1-V0).dot(n1-n0);
     II(0,1) = 2*(V1-V0).dot(n2-n0);
     II(1,0) = 2*(V2-V0).dot(n1-n0);
@@ -96,6 +114,61 @@ void GeoFeature::calculate_second_fundamental_form(Eigen::Vector3d V0, Eigen::Ve
 }
 
 
+void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Vector3d V_0, Eigen::Vector3d V_1, Eigen::Vector3d V_2, int start_ind, std::vector<Eigen::Matrix2d> &dII)
+{
+    Eigen::Matrix3d tri_vert; // start with V_{start_ind}
+    tri_vert.row((0-start_ind)%3) = V0;
+    tri_vert.row((1-start_ind)%3) = V1;
+    tri_vert.row((2-start_ind)%3) = V2;
+    
+    Eigen::Matrix3d adjacent_tri_vert;
+    adjacent_tri_vert.row((0-start_ind)%3) = V_0;
+    adjacent_tri_vert.row((1-start_ind)%3) = V_1;
+    adjacent_tri_vert.row((2-start_ind)%3) = V_2;
+    
+    Eigen::Vector3d nf;
+    std::vector<Eigen::Vector3d> edge_n;
+    std::vector<Eigen::Vector3d> dnf;
+    std::vector<Eigen::Vector3d> adjacent_nf;
+    std::vector<std::vector<Eigen::Vector3d>> diff_adjacent_nf;
+    std::vector<std::vector<Eigen::Vector3d>> diff_edge_n;
+    
+    edge_n.resize(3);
+    adjacent_nf.resize(3);
+    diff_adjacent_nf.resize(3);
+    diff_edge_n.resize(3);
+    
+    face_normal(tri_vert.row(0), tri_vert.row(1), tri_vert.row(2), 0, nf, dnf);
+    
+    for(int i=0;i<3;i++)
+    {
+        face_normal(tri_vert.row((i+2)%3), tri_vert.row((i+1)%3), adjacent_tri_vert.row(i), i-1 , adjacent_nf[i], diff_adjacent_nf[i]);
+    }
+    
+    for(int i=0;i<3;i++)
+    {
+        edge_n[i] = (nf+adjacent_nf[i]).normalized();
+        for(int j=0;j<3;j++)
+        {
+            diff_edge_n[i][j] = 1.0 / (nf+adjacent_nf[i]).norm() * (dnf[j]+diff_adjacent_nf[i][j]-(dnf[j]+diff_adjacent_nf[i][j]).dot(edge_n[i])*edge_n[i]);
+        }
+    }
+    
+    std::vector<Eigen::Vector3d> e(3);
+    e[0] << 1,0,0;
+    e[1] << 0,1,0;
+    e[2] << 0,0,1;
+    dII.resize(3);
+    
+    for(int k=0;k<3;k++)
+    {
+        dII[k](0,0) = -2*e[k].dot(edge_n[1]-edge_n[0]) + 2*(tri_vert.row(1)-tri_vert.row(0)).dot(diff_edge_n[1][k]-diff_edge_n[0][k]);
+        dII[k](0,1) = -2*e[k].dot(edge_n[2]-edge_n[0]) + 2*(tri_vert.row(1)-tri_vert.row(0)).dot(diff_edge_n[2][k]-diff_edge_n[0][k]);
+        dII[k](1,0) = -2*e[k].dot(edge_n[1]-edge_n[0]) + 2*(tri_vert.row(2)-tri_vert.row(0)).dot(diff_edge_n[1][k]-diff_edge_n[0][k]);
+        dII[k](1,1) = -2*e[k].dot(edge_n[2]-edge_n[0]) + 2*(tri_vert.row(2)-tri_vert.row(0)).dot(diff_edge_n[2][k]-diff_edge_n[0][k]);
+    }
+    
+}
 
 
 
