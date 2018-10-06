@@ -11,9 +11,9 @@
 
 void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, int start_ind, Eigen::Vector3d &nf, std::vector<Eigen::Vector3d> &dn)
 {
-    if (start_ind != 0 && start_ind != 1 && start_ind != 2)
+    if (start_ind != 0 && start_ind != 1 && start_ind != 2 && start_ind != -1)
     {
-        std::cout << "The differential vertex should lie on the triangle" << std::endl;
+        std::cout << "The differential vertex should lie on the triangle or set start_ind as -1" << std::endl;
         return;
     }
     nf = ((V1-V0).cross(V2-V0)).normalized();
@@ -32,9 +32,13 @@ void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vect
     {
         e=V0-V2;
     }
-    else
+    else if(start_ind==2)
     {
         e=V1-V0;
+    }
+    else
+    {
+        e << 0, 0 ,0;
     }
     for(int i=0;i<3;i++)
     {
@@ -116,56 +120,148 @@ void GeoFeature::calculate_second_fundamental_form(Eigen::Vector3d V0, Eigen::Ve
 
 void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Vector3d V_0, Eigen::Vector3d V_1, Eigen::Vector3d V_2, int start_ind, std::vector<Eigen::Matrix2d> &dII)
 {
-    Eigen::Matrix3d tri_vert; // start with V_{start_ind}
-    tri_vert.row((0-start_ind)%3) = V0;
-    tri_vert.row((1-start_ind)%3) = V1;
-    tri_vert.row((2-start_ind)%3) = V2;
-    
-    Eigen::Matrix3d adjacent_tri_vert;
-    adjacent_tri_vert.row((0-start_ind)%3) = V_0;
-    adjacent_tri_vert.row((1-start_ind)%3) = V_1;
-    adjacent_tri_vert.row((2-start_ind)%3) = V_2;
-    
-    Eigen::Vector3d nf;
-    std::vector<Eigen::Vector3d> edge_n;
-    std::vector<Eigen::Vector3d> dnf;
-    std::vector<Eigen::Vector3d> adjacent_nf;
-    std::vector<std::vector<Eigen::Vector3d>> diff_adjacent_nf;
-    std::vector<std::vector<Eigen::Vector3d>> diff_edge_n;
-    
-    edge_n.resize(3);
-    adjacent_nf.resize(3);
-    diff_adjacent_nf.resize(3);
-    diff_edge_n.resize(3);
-    
-    face_normal(tri_vert.row(0), tri_vert.row(1), tri_vert.row(2), 0, nf, dnf);
-    
-    for(int i=0;i<3;i++)
+    if(start_ind < 0 || start_ind > 6)
     {
-        face_normal(tri_vert.row((i+2)%3), tri_vert.row((i+1)%3), adjacent_tri_vert.row(i), i-1 , adjacent_nf[i], diff_adjacent_nf[i]);
+        std::cout<<"The differential vertex should lie on the triangle or its adjacencies."<<std::endl;
+        return;
     }
-    
-    for(int i=0;i<3;i++)
+    if(start_ind<3) // Calculate the gradient w.r.t. the vertex lying on the triangle
     {
-        edge_n[i] = (nf+adjacent_nf[i]).normalized();
-        for(int j=0;j<3;j++)
+        Eigen::Matrix3d tri_vert; // start with V{start_ind}
+        tri_vert.row((0-start_ind+3)%3) = V0;
+        tri_vert.row((1-start_ind+3)%3) = V1;
+        tri_vert.row((2-start_ind+3)%3) = V2;
+    
+        Eigen::Matrix3d adjacent_tri_vert;
+        adjacent_tri_vert.row((0-start_ind+3)%3) = V_0;
+        adjacent_tri_vert.row((1-start_ind+3)%3) = V_1;
+        adjacent_tri_vert.row((2-start_ind+3)%3) = V_2;
+    
+        Eigen::Vector3d nf;
+        std::vector<Eigen::Vector3d> edge_n;
+        std::vector<Eigen::Vector3d> dnf;
+        std::vector<Eigen::Vector3d> adjacent_nf;
+        std::vector<std::vector<Eigen::Vector3d> > diff_adjacent_nf(3, std::vector<Eigen::Vector3d>(3));
+        std::vector<std::vector<Eigen::Vector3d> > diff_edge_n(3, std::vector<Eigen::Vector3d>(3));
+    
+        edge_n.resize(3);
+        adjacent_nf.resize(3);
+    
+        face_normal(tri_vert.row(0), tri_vert.row(1), tri_vert.row(2), 0, nf, dnf);
+    
+        for(int i=0;i<3;i++)
         {
-            diff_edge_n[i][j] = 1.0 / (nf+adjacent_nf[i]).norm() * (dnf[j]+diff_adjacent_nf[i][j]-(dnf[j]+diff_adjacent_nf[i][j]).dot(edge_n[i])*edge_n[i]);
+            face_normal(tri_vert.row((i+2)%3), tri_vert.row((i+1)%3), adjacent_tri_vert.row(i), i-1 , adjacent_nf[i], diff_adjacent_nf[i]);
+        }
+    
+        for(int i=0;i<3;i++)
+        {
+            edge_n[i] = (nf+adjacent_nf[i]).normalized();
+            for(int j=0;j<3;j++)
+            {
+                diff_edge_n[i][j] = 1.0 / (nf+adjacent_nf[i]).norm() * (dnf[j]+diff_adjacent_nf[i][j]-(dnf[j]+diff_adjacent_nf[i][j]).dot(edge_n[i])*edge_n[i]);
+            }
+        }
+    
+        std::vector<Eigen::Vector3d> e(3);
+        e[0] << 1,0,0;
+        e[1] << 0,1,0;
+        e[2] << 0,0,1;
+        dII.resize(3);
+    
+        for(int k=0;k<3;k++)
+        {
+            if(start_ind==0)
+            {
+                dII[k](0,0) = -2*e[k].dot(edge_n[1]-edge_n[0]) + 2*(tri_vert.row(1)-tri_vert.row(0)).dot(diff_edge_n[1][k]-diff_edge_n[0][k]);
+                dII[k](0,1) = -2*e[k].dot(edge_n[2]-edge_n[0]) + 2*(tri_vert.row(1)-tri_vert.row(0)).dot(diff_edge_n[2][k]-diff_edge_n[0][k]);
+                dII[k](1,0) = -2*e[k].dot(edge_n[1]-edge_n[0]) + 2*(tri_vert.row(2)-tri_vert.row(0)).dot(diff_edge_n[1][k]-diff_edge_n[0][k]);
+                dII[k](1,1) = -2*e[k].dot(edge_n[2]-edge_n[0]) + 2*(tri_vert.row(2)-tri_vert.row(0)).dot(diff_edge_n[2][k]-diff_edge_n[0][k]);
+            }
+            else if(start_ind==1)
+            {
+                dII[k](0,0) = 2*e[k].dot(edge_n[0]-edge_n[2]) + 2*(tri_vert.row(0)-tri_vert.row(2)).dot(diff_edge_n[0][k]-diff_edge_n[2][k]);
+                dII[k](0,1) = 2*e[k].dot(edge_n[1]-edge_n[2]) + 2*(tri_vert.row(0)-tri_vert.row(2)).dot(diff_edge_n[1][k]-diff_edge_n[2][k]);
+                dII[k](1,0) = 2*(tri_vert.row(1)-tri_vert.row(2)).dot(diff_edge_n[0][k]-diff_edge_n[2][k]);
+                dII[k](1,1) = 2*(tri_vert.row(1)-tri_vert.row(2)).dot(diff_edge_n[1][k]-diff_edge_n[2][k]);
+            }
+            else if(start_ind==2)
+            {
+                dII[k](0,0) = 2*(tri_vert.row(2)-tri_vert.row(1)).dot(diff_edge_n[2][k]-diff_edge_n[1][k]);
+                dII[k](0,1) = 2*(tri_vert.row(2)-tri_vert.row(1)).dot(diff_edge_n[0][k]-diff_edge_n[1][k]);
+                dII[k](1,0) = 2*e[k].dot(edge_n[2]-edge_n[1]) + 2*(tri_vert.row(0)-tri_vert.row(1)).dot(diff_edge_n[2][k]-diff_edge_n[1][k]);
+                dII[k](1,1) = 2*e[k].dot(edge_n[0]-edge_n[1]) + 2*(tri_vert.row(0)-tri_vert.row(1)).dot(diff_edge_n[0][k]-diff_edge_n[1][k]);
+            }
+        
         }
     }
     
-    std::vector<Eigen::Vector3d> e(3);
-    e[0] << 1,0,0;
-    e[1] << 0,1,0;
-    e[2] << 0,0,1;
-    dII.resize(3);
-    
-    for(int k=0;k<3;k++)
+    else // Calculate the gradient w.r.t. the vertex lying on the adjacent triangle
     {
-        dII[k](0,0) = -2*e[k].dot(edge_n[1]-edge_n[0]) + 2*(tri_vert.row(1)-tri_vert.row(0)).dot(diff_edge_n[1][k]-diff_edge_n[0][k]);
-        dII[k](0,1) = -2*e[k].dot(edge_n[2]-edge_n[0]) + 2*(tri_vert.row(1)-tri_vert.row(0)).dot(diff_edge_n[2][k]-diff_edge_n[0][k]);
-        dII[k](1,0) = -2*e[k].dot(edge_n[1]-edge_n[0]) + 2*(tri_vert.row(2)-tri_vert.row(0)).dot(diff_edge_n[1][k]-diff_edge_n[0][k]);
-        dII[k](1,1) = -2*e[k].dot(edge_n[2]-edge_n[0]) + 2*(tri_vert.row(2)-tri_vert.row(0)).dot(diff_edge_n[2][k]-diff_edge_n[0][k]);
+        start_ind = start_ind - 3;
+        Eigen::Matrix3d tri_vert; // start with V_{start_ind}
+        tri_vert.row((0-start_ind+3)%3) = V0;
+        tri_vert.row((1-start_ind+3)%3) = V1;
+        tri_vert.row((2-start_ind+3)%3) = V2;
+        
+        Eigen::Matrix3d adjacent_tri_vert;
+        adjacent_tri_vert.row((0-start_ind+3)%3) = V_0;
+        adjacent_tri_vert.row((1-start_ind+3)%3) = V_1;
+        adjacent_tri_vert.row((2-start_ind+3)%3) = V_2;
+        
+        Eigen::Vector3d nf;
+        std::vector<Eigen::Vector3d> edge_n;
+        std::vector<Eigen::Vector3d> dnf;
+        std::vector<Eigen::Vector3d> adjacent_nf;
+        std::vector<std::vector<Eigen::Vector3d> > diff_adjacent_nf(3, std::vector<Eigen::Vector3d>(3));
+        std::vector<std::vector<Eigen::Vector3d> > diff_edge_n(3, std::vector<Eigen::Vector3d>(3));
+        
+        edge_n.resize(3);
+        adjacent_nf.resize(3);
+        
+        face_normal(tri_vert.row(0), tri_vert.row(1), tri_vert.row(2), -1, nf, dnf);
+        
+        for(int i=0;i<3;i++)
+        {
+            face_normal(tri_vert.row((i+2)%3), tri_vert.row((i+1)%3), adjacent_tri_vert.row(i), 2, adjacent_nf[i], diff_adjacent_nf[i]);
+        }
+        
+        for(int i=0;i<3;i++)
+        {
+            edge_n[i] = (nf+adjacent_nf[i]).normalized();
+            for(int j=0;j<3;j++)
+            {
+                diff_edge_n[i][j] = 1.0 / (nf+adjacent_nf[i]).norm() * (dnf[j]+diff_adjacent_nf[i][j]-(dnf[j]+diff_adjacent_nf[i][j]).dot(edge_n[i])*edge_n[i]);
+            }
+        }
+        
+        dII.resize(3);
+        
+        for(int k=0;k<3;k++)
+        {
+            if(start_ind==0)
+            {
+                dII[k](0,0) = 2*(tri_vert.row(1)-tri_vert.row(0)).dot(-diff_edge_n[0][k]);
+                dII[k](0,1) = 2*(tri_vert.row(1)-tri_vert.row(0)).dot(-diff_edge_n[0][k]);
+                dII[k](1,0) = 2*(tri_vert.row(2)-tri_vert.row(0)).dot(-diff_edge_n[0][k]);
+                dII[k](1,1) = 2*(tri_vert.row(2)-tri_vert.row(0)).dot(-diff_edge_n[0][k]);
+            }
+            else if(start_ind==1)
+            {
+                dII[k](0,0) = 2*(tri_vert.row(0)-tri_vert.row(2)).dot(diff_edge_n[0][k]);
+                dII[k](0,1) = 0;
+                dII[k](1,0) = 2*(tri_vert.row(1)-tri_vert.row(2)).dot(diff_edge_n[0][k]);
+                dII[k](1,1) = 0;
+            }
+            else if(start_ind==2)
+            {
+                dII[k](0,0) = 0;
+                dII[k](0,1) = 2*(tri_vert.row(2)-tri_vert.row(1)).dot(diff_edge_n[0][k]);
+                dII[k](1,0) = 0;
+                dII[k](1,1) = 2*(tri_vert.row(0)-tri_vert.row(1)).dot(diff_edge_n[0][k]);
+            }
+            
+        }
     }
     
 }
@@ -218,6 +314,81 @@ void GeoFeature::test_face_normal()
             }
             w.setZero();
             U=V;
+        }
+    }
+    
+}
+
+
+void GeoFeature::test_second_fundamental_form()
+{
+    Eigen::Matrix3d triangle, adjacent_tiangle,triangle1,adjacent_tiangle1;
+    triangle<<1.5,0,0,
+    1,0.2,1,
+    0,0,3;
+    adjacent_tiangle<<-0.5,0,0,
+    0,-1,0,
+    0,0,-1.5;
+    triangle1 = triangle;
+    adjacent_tiangle1 = adjacent_tiangle;
+    Eigen::Matrix2d II,II_1,diff_II;
+    std::vector<Eigen::Matrix2d> dII;
+    
+    calculate_second_fundamental_form(triangle.row(0), triangle.row(1), triangle.row(2), adjacent_tiangle.row(0), adjacent_tiangle.row(1), adjacent_tiangle.row(2), II);
+    
+    std::cout<<"Test for the vertices lying on the current triabgle"<<std::endl;
+    // Add some disturbance to the vertex of the triangle
+    for(int i=0;i<3;i++)
+    {
+        diff_second_fundamental_form(triangle.row(0), triangle.row(1), triangle.row(2), adjacent_tiangle.row(0), adjacent_tiangle.row(1), adjacent_tiangle.row(2), i, dII);
+        Eigen::Vector3d w;
+        w.setZero();
+        for(int j=0;j<3;j++)
+        {
+            for(int k=3;k<9;k++)
+            {
+                w(j) = pow(10,-k);
+                triangle1(i,j) = triangle(i,j) + w(j);
+                calculate_second_fundamental_form(triangle1.row(0), triangle1.row(1), triangle1.row(2), adjacent_tiangle.row(0), adjacent_tiangle.row(1), adjacent_tiangle.row(2), II_1);
+                diff_II = (II_1-II)/w(j);
+                std::cout<<"Eplison is: "<<w(j)<<std::endl;
+                std::cout<<"The finite difference of the II w.r.t. "<<j<<"th component of the vertex "<<i<<" is: "<<std::endl;
+                std::cout<<diff_II<<std::endl;
+                std::cout<<"The gradient of the II w.r.t. "<<j<<"th component of the vertex "<<i<<" is: "<<std::endl;
+                std::cout<<dII[j]<<std::endl;
+                std::cout<<"The error between the gradient and the finite difference of the II w.r.t. "<<j<<"th component of the vertex "<<i<<" is: "<<std::endl;
+                std::cout<<(diff_II-dII[j]).cwiseAbs()<<std::endl;
+            }
+            w.setZero();
+            triangle1 = triangle;
+        }
+    }
+    
+    std::cout<<"Test for the vertices lying on the adjacent triangles"<<std::endl;
+    // Add some disturbance to the vertex of adjacent triangles
+    for(int i=0;i<3;i++)
+    {
+        diff_second_fundamental_form(triangle.row(0), triangle.row(1), triangle.row(2), adjacent_tiangle.row(0), adjacent_tiangle.row(1), adjacent_tiangle.row(2), i+3, dII);
+        Eigen::Vector3d w;
+        w.setZero();
+        for(int j=0;j<3;j++)
+        {
+            for(int k=3;k<9;k++)
+            {
+                w(j) = pow(10,-k);
+                adjacent_tiangle1(i,j) = adjacent_tiangle(i,j) + w(j);
+                calculate_second_fundamental_form(triangle.row(0), triangle.row(1), triangle.row(2), adjacent_tiangle1.row(0), adjacent_tiangle1.row(1), adjacent_tiangle1.row(2), II_1);
+                diff_II = (II_1-II)/w(j);
+                std::cout<<"Eplison is: "<<w(j)<<std::endl;
+                std::cout<<"The finite difference of the II w.r.t. "<<j<<"th component of the vertex "<<i<<" is: "<<std::endl;
+                std::cout<<diff_II<<std::endl;
+                std::cout<<"The gradient of the II w.r.t. "<<j<<"th component of the vertex "<<i<<" is: "<<std::endl;
+                std::cout<<dII[j]<<std::endl;
+                std::cout<<"The error between the gradient and the finite difference of the II w.r.t. "<<j<<"th component of the vertex "<<i<<" is: "<<std::endl;
+                std::cout<<(diff_II-dII[j]).cwiseAbs()<<std::endl;
+            }
+            w.setZero();
+            adjacent_tiangle1 = adjacent_tiangle;
         }
     }
     

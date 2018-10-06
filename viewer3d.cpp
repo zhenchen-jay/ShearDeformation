@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
     //igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/Models/result.obj", V0, F0);
     
     //op->test(V, F, 0.3, 1e5, 1, 3);
-    op1->compute_deformed_surface(V,F,0.3,1e5,1,3);
-    //GeoFeature::test_face_normal();
+    //op1->compute_deformed_surface(V,F,0.3,1e5,1,3);
+    GeoFeature::test_second_fundamental_form();
     // write_boundary(V, F);
     //test_grad();
     

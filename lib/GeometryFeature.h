@@ -55,7 +55,8 @@ namespace GeoFeature
      This function calcualtes the gradient of the second fundamental form w.r.t. the vertex which lies on this triangle.
      @param[in] {V0,V1,V2}: The vertices of the triangle
      @param[in] {V_0,V_1,V_2}: The vertices of the adjacent triangles, s.t. {V_0,V2,V1},{V_1,V0,V2},{V_2,V1,V0} are adjacent triangles on the given triangle mesh.
-     @param[in] start_ind: The flag of variable V which belongs to {V0,V1,V2}, that is, start_ind = i, then V = Vi
+     @param[in] start_ind: The flag of variable V which belongs to {V0,V1,V2} or {V_0,V_1,V_2}, that is, start_ind = i(0<=i<=2), then V = Vi, otherwise, start_ind = i+3 (0<=i<=2), then V = V_i
+     
      
      @param[out] dII: The gradient of the second fundamental form w.r.t to the vertex V_{start_ind}
      
@@ -65,6 +66,8 @@ namespace GeoFeature
     // Test functions which can be used to check whether the derivative is correct
     
     void test_face_normal();
+    
+    void test_second_fundamental_form();
     
 }
 #endif /* GeometryFeature_h */
