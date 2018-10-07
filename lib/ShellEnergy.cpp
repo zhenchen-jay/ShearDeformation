@@ -99,17 +99,17 @@ void ShellEnergy::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::M
         {
             if(TT(i,k)!=-1)
             {
-                index[2-k] = F( TT(i,k), (TTi(i,k)+2)%3 );
-                adjacent_points[2-k] = V.row(index[2-k]);
-                adjacent_points_U[2-k] = V.row(index[2-k]);
-                real_pts[2-k] = true;
+                index[(k+2)%3] = F( TT(i,k), (TTi(i,k)+2)%3 );
+                adjacent_points[(k+2)%3] = V.row(index[(k+2)%3]);
+                adjacent_points_U[(k+2)%3] = V0.row(index[(k+2)%3]);
+                real_pts[(k+2)%3] = true;
             }
             else
             {
-                index[2-k] = -1; // Boundary edge
-                adjacent_points[2-k] << -1,-1,-1;
-                adjacent_points_U[2-k] << -1,-1,-1;
-                real_pts[2-k] = false;
+                index[(k+2)%3] = -1; // Boundary edge
+                adjacent_points[(k+2)%3] << -1,-1,-1;
+                adjacent_points_U[(k+2)%3] << -1,-1,-1;
+                real_pts[(k+2)%3] = false;
             }
         }
         
@@ -139,15 +139,15 @@ void ShellEnergy::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::M
             {
                 if(TT(f,k)!=-1)
                 {
-                    index[2-k] = F( TT(f,k), (TTi(f,k)+2)%3 );
-                    adjacent_points[2-k] = V.row(index[2-k]);
-                    real_pts[2-k] = true;
+                    index[(k+2)%3] = F( TT(f,k), (TTi(f,k)+2)%3 );
+                    adjacent_points[(k+2)%3] = V.row(index[(k+2)%3]);
+                    real_pts[(k+2)%3] = true;
                 }
                 else
                 {
-                    index[2-k] = -1; // Boundary edge
-                    adjacent_points[2-k] << -1,-1,-1;
-                    real_pts[2-k] = false;
+                    index[(k+2)%3] = -1; // Boundary edge
+                    adjacent_points[(k+2)%3] << -1,-1,-1;
+                    real_pts[(k+2)%3] = false;
                 }
             }
             GeoFeature::diff_second_fundamental_form(V.row(F(f, 0)), V.row(F(f, 1)), V.row(F(f, 2)), adjacent_points[0], adjacent_points[1], adjacent_points[2], fi, real_pts, dII);
@@ -161,6 +161,7 @@ void ShellEnergy::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::M
                  beta * (Q * dQ[k]).trace());
                 
             }
+            
             if(TT(f,(fi+1)%3)!=-1) // Doesn't belong to the boundary
             {
                 int fa = TT(f,(fi+1)%3);
@@ -170,15 +171,15 @@ void ShellEnergy::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::M
                 {
                     if(TT(fa,k)!=-1)
                     {
-                        index[2-k] = F( TT(fa,k), (TTi(fa,k)+2)%3 );
-                        adjacent_points[2-k] = V.row(index[2-k]);
-                        real_pts[2-k] = true;
+                        index[(k+2)%3] = F( TT(fa,k), (TTi(fa,k)+2)%3 );
+                        adjacent_points[(k+2)%3] = V.row(index[(k+2)%3]);
+                        real_pts[(k+2)%3] = true;
                     }
                     else
                     {
-                        index[2-k] = -1; // Boundary edge
-                        adjacent_points[2-k] << -1,-1,-1;
-                        real_pts[2-k] = false;
+                        index[(k+2)%3] = -1; // Boundary edge
+                        adjacent_points[(k+2)%3] << -1,-1,-1;
+                        real_pts[(k+2)%3] = false;
                     }
                 }
                  GeoFeature::diff_second_fundamental_form(V.row(F(fa, 0)), V.row(F(fa, 1)), V.row(F(fa, 2)), adjacent_points[0], adjacent_points[1], adjacent_points[2], start_ind, real_pts, dII);
