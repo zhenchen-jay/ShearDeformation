@@ -4,23 +4,24 @@
 //
 //  Created by 陈臻 on 10/4/18.
 //
-#ifndef ORIGIN
-#define ORIGIN -0.5
-#endif
 
 #include "GravityEnergy.h"
+#include <iostream>
 
-void GravityEnergy::gravity_energy(Eigen::MatrixXd V, double mass, double &E, Eigen::VectorXd &dE)
+void GravityEnergy::gravity_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, std::vector<Eigen::Vector3d> external_force, double &E, Eigen::VectorXd &dE)
 {
     E = 0;
-    dE.resize(V.rows()*3);
+    dE.resize(3*V.rows());
     dE.setZero();
+    if(external_force.size()!=V.rows())
+    {
+        std::cout<<"The number of external forces doesn't match the the mumber of the vertices"<<std::endl;
+        return;
+        
+    }
     for(int i=0;i<V.rows();i++)
     {
-        if(V(i,1)-ORIGIN>0)
-        {
-            E = E + 9.8*(V(i,1)-ORIGIN);
-            dE(3*i+1) = 9.8;
-        }
+        E += external_force[i].dot(V.row(i)-V0.row(i));
+        dE.segment(3*i, 3) = -external_force[i];
     }
 }

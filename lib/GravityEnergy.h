@@ -8,6 +8,7 @@
 #ifndef GravityEnergy_h
 #define GravityEnergy_h
 #include<Eigen/Dense>
+#include<vector>
 
 class GravityEnergy
 {
@@ -16,7 +17,7 @@ public:
     ~GravityEnergy(){};
     
 public:
-    void gravity_energy(Eigen::MatrixXd V, double mass, double &E, Eigen::VectorXd &dE);
+    void gravity_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, std::vector<Eigen::Vector3d> external_force, double &E, Eigen::VectorXd &dE);
     
     
 };

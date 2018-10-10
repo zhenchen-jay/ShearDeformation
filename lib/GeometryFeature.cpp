@@ -138,7 +138,7 @@ void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3
         tri_vert.row((0-start_ind+3)%3) = V0;
         tri_vert.row((1-start_ind+3)%3) = V1;
         tri_vert.row((2-start_ind+3)%3) = V2;
-    
+        
         Eigen::Matrix3d adjacent_tri_vert;
         std::vector<bool> real_pts_after(3);
         adjacent_tri_vert.row((0-start_ind+3)%3) = V_0;
@@ -148,19 +148,19 @@ void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3
         real_pts_after[(0-start_ind+3)%3] = real_pts[0];
         real_pts_after[(1-start_ind+3)%3] = real_pts[1];
         real_pts_after[(2-start_ind+3)%3] = real_pts[2];
-    
+        
         Eigen::Vector3d nf;
         std::vector<Eigen::Vector3d> edge_n;
         std::vector<Eigen::Vector3d> dnf;
         std::vector<Eigen::Vector3d> adjacent_nf;
         std::vector<std::vector<Eigen::Vector3d> > diff_adjacent_nf(3, std::vector<Eigen::Vector3d>(3));
         std::vector<std::vector<Eigen::Vector3d> > diff_edge_n(3, std::vector<Eigen::Vector3d>(3));
-    
+        
         edge_n.resize(3);
         adjacent_nf.resize(3);
-    
+        
         face_normal(tri_vert.row(0), tri_vert.row(1), tri_vert.row(2), 0, nf, dnf);
-    
+        
         for(int i=0;i<3;i++)
         {
             if(real_pts_after[i])
@@ -173,7 +173,7 @@ void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3
                     diff_adjacent_nf[i][j].setZero();
             }
         }
-    
+        
         for(int i=0;i<3;i++)
         {
             edge_n[i] = (nf+adjacent_nf[i]).normalized();
@@ -182,13 +182,13 @@ void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3
                 diff_edge_n[i][j] = 1.0 / (nf+adjacent_nf[i]).norm() * (dnf[j]+diff_adjacent_nf[i][j]-(dnf[j]+diff_adjacent_nf[i][j]).dot(edge_n[i])*edge_n[i]);
             }
         }
-    
+        
         std::vector<Eigen::Vector3d> e(3);
         e[0] << 1,0,0;
         e[1] << 0,1,0;
         e[2] << 0,0,1;
         dII.resize(3);
-    
+        
         for(int k=0;k<3;k++)
         {
             if(start_ind==0)
@@ -212,7 +212,7 @@ void GeoFeature::diff_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3
                 dII[k](1,0) = 2*e[k].dot(edge_n[2]-edge_n[1]) + 2*(tri_vert.row(0)-tri_vert.row(1)).dot(diff_edge_n[2][k]-diff_edge_n[1][k]);
                 dII[k](1,1) = 2*e[k].dot(edge_n[0]-edge_n[1]) + 2*(tri_vert.row(0)-tri_vert.row(1)).dot(diff_edge_n[0][k]-diff_edge_n[1][k]);
             }
-        
+            
         }
     }
     
@@ -356,11 +356,11 @@ void GeoFeature::test_face_normal()
 void GeoFeature::test_second_fundamental_form()
 {
     Eigen::Matrix3d triangle, adjacent_tiangle,triangle1,adjacent_tiangle1;
-    triangle<<1.5,0,0,
-    1,0.2,1,
-    0,0,3;
-    adjacent_tiangle<<-0.5,0,0,
-    0,-1,0,
+    triangle<<1,1,0,
+    -1,1,0,
+    -1,-1,0;
+    adjacent_tiangle<<0,0,0,
+    1,-1,-0.5,
     0,0,-1.5;
     triangle1 = triangle;
     adjacent_tiangle1 = adjacent_tiangle;
@@ -368,8 +368,8 @@ void GeoFeature::test_second_fundamental_form()
     std::vector<Eigen::Matrix2d> dII;
     std::vector<bool> real_pts(3);
     for(int i=0;i<3;i++)
-        real_pts[i] = true;
-    real_pts[0] = false;
+        real_pts[i] = false;
+    real_pts[1] = true;
     
     calculate_second_fundamental_form(triangle.row(0), triangle.row(1), triangle.row(2), adjacent_tiangle.row(0), adjacent_tiangle.row(1), adjacent_tiangle.row(2), real_pts,II);
     
