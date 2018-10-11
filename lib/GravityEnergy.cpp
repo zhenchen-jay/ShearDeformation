@@ -21,7 +21,7 @@ void GravityEnergy::gravity_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, std::v
     }
     for(int i=0;i<V.rows();i++)
     {
-        E += external_force[i].dot(V.row(i)-V0.row(i));
+        E -= external_force[i].dot(V.row(i)-V0.row(i));
         dE.segment(3*i, 3) = -external_force[i];
     }
 }

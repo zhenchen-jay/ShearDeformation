@@ -96,11 +96,11 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
         return;
     }
     alglib::real_1d_array x;
-    double epsg = 0;
-    double epsf = 0;
-    double epsx = 0;
-    double stpmax = 0.1;
-    alglib::ae_int_t maxits = 3000;
+    double epsg = 1e-8;
+    double epsf = 1e-8;
+    double epsx = 1e-8;
+    double stpmax = 0;
+    alglib::ae_int_t maxits = 1000;
     alglib::minlbfgsstate state;
     alglib::minlbfgsreport rep;
     x.setlength(3*V.rows());
@@ -151,7 +151,6 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
     op_gravity->gravity_energy(V, VU, external_force, E_gravity, diff_f_gravity);
     f = E_streching + E_bending + E_gravity;
     //    f = E_bending + E_streching;
-    std::cout<<f<<" "<<E_gravity<<std::endl;
     for(int i=0;i<df.length();i++)
     {
         df[i] = diff_f_streching(i) + diff_f_bending(i) + diff_f_gravity(i);
@@ -164,6 +163,16 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
             df[3*p_fixed_index[i]+j]=0;
         }
     }
+    std::cout<<E_streching + E_bending<<std::endl;
+    std::cout<<(diff_f_bending+diff_f_streching).norm()<<std::endl;
+    for(int i=0;i<diff_f_bending.rows();i++)
+    {
+        if(abs(diff_f_streching(i)+diff_f_bending(i))>1e-6)
+        {
+            std::cout<<i<<" "<<diff_f_streching(i)+diff_f_bending(i)<<std::endl;
+        }
+    }
+    std::cout<<(diff_f_streching+diff_f_bending+diff_f_gravity).norm()<<std::endl;
 }
 
 
