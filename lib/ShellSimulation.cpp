@@ -4,7 +4,7 @@
 
 #include "ShellSimulation.h"
 #include "ShellEnergy.h"
-#include "GravityEnergy.h"
+#include "ExternalEnergy.h"
 #include <igl/readOBJ.h>
 #include <fstream>
 
@@ -96,11 +96,11 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
         return;
     }
     alglib::real_1d_array x;
-    double epsg = 0;
-    double epsf = 0;
-    double epsx = 0;
+    double epsg = 1e-8;
+    double epsf = 1e-8;
+    double epsx = 1e-8;
     double stpmax = 0;
-    alglib::ae_int_t maxits = 10000;
+    alglib::ae_int_t maxits = 20000;
 //    alglib::mincgstate state;
 //    alglib::mincgreport rep;
     alglib::minlbfgsstate state;
@@ -128,6 +128,28 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
         V.row(i)<<x[3*i],x[3*i+1],x[3*i+2];
     }
     printf("%d\n", int(rep.terminationtype));
+//    Rep     -   optimization report:
+//    * Rep.TerminationType completetion code:
+//    * -8    internal integrity control  detected  infinite
+//    or NAN values in  function/gradient.  Abnormal
+//    termination signalled.
+//    * -7    gradient verification failed.
+//    See MinLBFGSSetGradientCheck() for more information.
+//        * -2    rounding errors prevent further improvement.
+//        X contains best point found.
+//        * -1    incorrect parameters were specified
+//        *  1    relative function improvement is no more than
+//        EpsF.
+//        *  2    relative step is no more than EpsX.
+//        *  4    gradient norm is no more than EpsG
+//        *  5    MaxIts steps was taken
+//        *  7    stopping conditions are too stringent,
+//        further improvement is impossible
+//        *  8    terminated by user who called minlbfgsrequesttermination().
+//        X contains point which was "current accepted" when
+//        termination request was submitted.
+//        * Rep.IterationsCount contains iterations count
+//        * NFEV countains number of function calculations
 }
 
 void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df)
@@ -150,17 +172,17 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
         V.row(i)<<x[3*i],x[3*i+1],x[3*i+2];
     }
     auto op_shell = std::make_unique<ShellEnergy>();
-    auto op_gravity = std::make_unique<GravityEnergy>();
-    double E_streching(0), E_gravity(0), E_bending(0);
-    Eigen::VectorXd diff_f_streching,diff_f_gravity,diff_f_bending;
+    auto op_external = std::make_unique<ExternalEnergy>();
+    double E_streching(0), E_external(0), E_bending(0);
+    Eigen::VectorXd diff_f_streching,diff_f_external,diff_f_bending;
     op_shell->streching_energy(V,VU,F,_YoungsModulus,_PoissonsRatio,_thickness,E_streching,diff_f_streching);
     op_shell->bending_energy(V, VU, F, _YoungsModulus, _PoissonsRatio, _thickness, E_bending, diff_f_bending);
-    op_gravity->gravity_energy(V, VU, external_force, E_gravity, diff_f_gravity);
-    f = E_streching + E_bending + E_gravity;
+    op_external->external_energy(V, VU, external_force, E_external, diff_f_external);
+    f = E_streching + E_bending + E_external;
     //    f = E_bending + E_streching;
     for(int i=0;i<df.length();i++)
     {
-        df[i] = diff_f_streching(i) + diff_f_bending(i) + diff_f_gravity(i);
+        df[i] = diff_f_streching(i) + diff_f_bending(i) + diff_f_external(i);
         //        df[i] = diff_f_streching(i) + diff_f_bending(i);
     }
     for(int i=0;i<p_fixed_index.size();i++)
@@ -170,9 +192,9 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
             df[3*p_fixed_index[i]+j]=0;
         }
     }
-    std::cout<<E_streching + E_bending + E_gravity<<std::endl;
+    std::cout<<E_streching + E_bending + E_external<<std::endl;
     std::cout<<(diff_f_bending+diff_f_streching).norm()<<std::endl;
-    std::cout<<(diff_f_gravity).norm()<<std::endl;
+    std::cout<<(diff_f_external).norm()<<std::endl;
 }
 
 

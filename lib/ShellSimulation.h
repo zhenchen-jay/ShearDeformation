@@ -1,5 +1,5 @@
 //
-// Created by 陈臻 on 10/3/18.
+// Created by Zhen Chen on 10/3/18.
 //
 
 #ifndef SHEARDEFORMATION_SHELLSIMULATION_H

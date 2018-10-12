@@ -38,10 +38,10 @@ void repaint(igl::opengl::glfw::Viewer &viewer)
 
 int main(int argc, char *argv[])
 {
-    //std::string problem = "/Users/chenzhen/UT/Research/shellbenchmarks/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
-    std:: string problem = "/Users/chenzhen/UT/Research/shellbenchmarks/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
-    //std::string problem = "/Users/chenzhen/UT/Research/shellbenchmarks/benchmarks/DrapedRect/3876_triangles/draped_rect";
-    //std::string problem = "/Users/chenzhen/UT/Research/shellbenchmarks/benchmarks/ClampedCylindricalShell/2496_triangles/cantilever_cylindrical_shell";
+    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
+    std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
+    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect";
+    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/ClampedCylindricalShell/2496_triangles/cantilever_cylindrical_shell";
     bool ok = op->set_up_simulation(problem);
     if (!ok)
     {

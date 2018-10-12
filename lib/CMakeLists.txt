@@ -21,14 +21,12 @@ include_directories( ${LIBIGL_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR})
 ################################################################################
 
 add_library(lib
-        simulation.h
-        simulation.cpp
         ShellEnergy.h
         ShellEnergy.cpp
         ShellSimulation.h
         ShellSimulation.cpp
-        GravityEnergy.h
-        GravityEnergy.cpp
+        ExternalEnergy.h
+        ExternalEnergy.cpp
         GeometryFeature.h
         GeometryFeature.cpp
         MeshConnection.h
