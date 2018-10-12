@@ -96,11 +96,13 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
         return;
     }
     alglib::real_1d_array x;
-    double epsg = 1e-8;
-    double epsf = 1e-8;
-    double epsx = 1e-8;
+    double epsg = 0;
+    double epsf = 0;
+    double epsx = 0;
     double stpmax = 0;
-    alglib::ae_int_t maxits = 1000;
+    alglib::ae_int_t maxits = 10000;
+//    alglib::mincgstate state;
+//    alglib::mincgreport rep;
     alglib::minlbfgsstate state;
     alglib::minlbfgsreport rep;
     x.setlength(3*V.rows());
@@ -111,7 +113,12 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
         }
     
     // Solve the optimization problem using alglib
-    alglib::minlbfgscreate(1, x, state);
+    //    alglib::mincgcreate(x, state);
+    //    alglib::mincgsetcond(state, epsg, epsf, epsx, maxits);
+    //    alglib::mincgsetstpmax(state, stpmax);
+    //    alglib::mincgoptimize(state, callback_func, NULL, this);
+    //    alglib::mincgresults(state, x, rep);
+    alglib::minlbfgscreate(x.length(),x, state);
     alglib::minlbfgssetcond(state, epsg, epsf, epsx, maxits);
     alglib::minlbfgssetstpmax(state, stpmax);
     alglib::minlbfgsoptimize(state, callback_func, NULL, this);
@@ -120,7 +127,7 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
     {
         V.row(i)<<x[3*i],x[3*i+1],x[3*i+2];
     }
-    
+    printf("%d\n", int(rep.terminationtype));
 }
 
 void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df)
@@ -163,16 +170,9 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
             df[3*p_fixed_index[i]+j]=0;
         }
     }
-    std::cout<<E_streching + E_bending<<std::endl;
+    std::cout<<E_streching + E_bending + E_gravity<<std::endl;
     std::cout<<(diff_f_bending+diff_f_streching).norm()<<std::endl;
-    for(int i=0;i<diff_f_bending.rows();i++)
-    {
-        if(abs(diff_f_streching(i)+diff_f_bending(i))>1e-6)
-        {
-            std::cout<<i<<" "<<diff_f_streching(i)+diff_f_bending(i)<<std::endl;
-        }
-    }
-    std::cout<<(diff_f_streching+diff_f_bending+diff_f_gravity).norm()<<std::endl;
+    std::cout<<(diff_f_gravity).norm()<<std::endl;
 }
 
 
