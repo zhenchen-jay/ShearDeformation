@@ -1,6 +1,5 @@
-//
 // Created by Zhen Chen on 10/3/18.
-//
+
 
 #include "ShellSimulation.h"
 #include "ShellEnergy.h"
