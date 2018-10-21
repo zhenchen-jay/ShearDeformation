@@ -15,14 +15,19 @@ cmake_minimum_required(VERSION 3.3)
 
 find_package(LIBIGL REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED)
 
-include_directories( ${LIBIGL_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR})
+include_directories( ${LIBIGL_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 ################################################################################
 
 add_library(lib
         ShellEnergy.h
         ShellEnergy.cpp
+        ShellEnergyWithSwellRatio.h
+        ShellEnergyWithSwellRatio.cpp
+        ShellEnergyStandard.h
+        ShellEnergyStandard.cpp
         ShellSimulation.h
         ShellSimulation.cpp
         ExternalEnergy.h
@@ -31,7 +36,8 @@ add_library(lib
         GeometryFeature.cpp
         MeshConnection.h
         MeshConnection.cpp
-        )
+        elliptic_functions.cpp
+        elliptic_functions.h)
 
 set_target_properties(lib PROPERTIES CXX_STANDARD 14)
 set_target_properties(lib PROPERTIES CXX_STANDARD_REQUIRED ON)

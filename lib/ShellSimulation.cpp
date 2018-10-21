@@ -4,6 +4,8 @@
 #include "ShellSimulation.h"
 #include "ShellEnergy.h"
 #include "ExternalEnergy.h"
+#include "ShellEnergyStandard.h"
+#include "ShellEnergyWithSwellRatio.h"
 #include <igl/readOBJ.h>
 #include <fstream>
 
@@ -96,10 +98,10 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
     }
     alglib::real_1d_array x;
     double epsg = 1e-8;
-    double epsf = 1e-8;
-    double epsx = 1e-8;
+    double epsf = 0;
+    double epsx = 0;
     double stpmax = 0;
-    alglib::ae_int_t maxits = 20000;
+    alglib::ae_int_t maxits = 10000;
 //    alglib::mincgstate state;
 //    alglib::mincgreport rep;
     alglib::minlbfgsstate state;
@@ -170,30 +172,31 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
     {
         V.row(i)<<x[3*i],x[3*i+1],x[3*i+2];
     }
-    auto op_shell = std::make_unique<ShellEnergy>();
+    std::unique_ptr<ShellEnergy> op_shell;
+    op_shell = std::make_unique<ShellEnergyWithSwellRatio>();
     auto op_external = std::make_unique<ExternalEnergy>();
     double E_streching(0), E_external(0), E_bending(0);
     Eigen::VectorXd diff_f_streching,diff_f_external,diff_f_bending;
     op_shell->streching_energy(V,VU,F,_YoungsModulus,_PoissonsRatio,_thickness,E_streching,diff_f_streching);
     op_shell->bending_energy(V, VU, F, _YoungsModulus, _PoissonsRatio, _thickness, E_bending, diff_f_bending);
-    op_external->external_energy(V, VU, external_force, E_external, diff_f_external);
-    f = E_streching + E_bending + E_external;
-    //    f = E_bending + E_streching;
+   // op_external->external_energy(V, VU, external_force, E_external, diff_f_external);
+   // f = E_streching + E_bending + E_external;
+    f = E_bending + E_streching;
     for(int i=0;i<df.length();i++)
     {
-        df[i] = diff_f_streching(i) + diff_f_bending(i) + diff_f_external(i);
-        //        df[i] = diff_f_streching(i) + diff_f_bending(i);
+        //df[i] = diff_f_streching(i) + diff_f_bending(i) + diff_f_external(i);
+        df[i] = diff_f_streching(i) + diff_f_bending(i);
     }
-    for(int i=0;i<p_fixed_index.size();i++)
-    {
-        for(int j=0;j<3;j++)
-        {
-            df[3*p_fixed_index[i]+j]=0;
-        }
-    }
+//    for(int i=0;i<p_fixed_index.size();i++)
+//    {
+//        for(int j=0;j<3;j++)
+//        {
+//            df[3*p_fixed_index[i]+j]=0;
+//        }
+//    }
     std::cout<<E_streching + E_bending + E_external<<std::endl;
     std::cout<<(diff_f_bending+diff_f_streching).norm()<<std::endl;
-    std::cout<<(diff_f_external).norm()<<std::endl;
+//    std::cout<<(diff_f_external).norm()<<std::endl;
 }
 
 
