@@ -31,7 +31,7 @@ public:
     // Bending Energy
 
     virtual void bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::MatrixXi F,
-                                double YoungsModulus, double PossionRatio, double thickness, double &E, Eigen::VectorXd &dE) override;
+                                double YoungsModulus, double PossionRatio, double thickness, double &E, Eigen::VectorXd &d) override;
 
     /*
      This function calculates the bending energy
@@ -49,6 +49,7 @@ public:
     
 private:
     double compute_omega(double radius, double x, double y, double modulus);
+    
 };
 
 

@@ -13,11 +13,12 @@ class ShellSimulation
 {
     
 public:
-    ShellSimulation() : _is_initialized(false) {};
+    ShellSimulation() : _is_initialized(false), _itr_times(0) {};
     
     ~ShellSimulation() {};
     
 public:
+    void add_noise();
     
     bool set_up_simulation(const std::string &prefix);
     
@@ -54,9 +55,11 @@ public:
     std::vector<Eigen::Vector3d> p_fixed;
     std::vector<int> p_fixed_index;
     std::vector<Eigen::Vector3d> external_force;
+    double ratio;
     
 private:
     bool _is_initialized;
+    int _itr_times;
 };
 
 

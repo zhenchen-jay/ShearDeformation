@@ -8,13 +8,10 @@
 #include "ShellEnergyWithSwellRatio.h"
 #include <igl/readOBJ.h>
 #include <fstream>
-
-int times = 0;
+#include <time.h>
 
 void callback_func(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
 {
-    times++;
-    std::cout<<times<<std::endl;
     ShellSimulation* callback = (ShellSimulation*) ptr;
     callback->energy_func_grad(x,f,df);
 }
@@ -84,6 +81,7 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix)
     mfs >> _PoissonsRatio;
     if (!mfs)
         return false;
+    ratio = 0;
     _is_initialized = true;
     
     return true;
@@ -91,13 +89,14 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix)
 
 void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::MatrixXi &F)
 {
+    _itr_times=0;
     if(!_is_initialized)
     {
         std::cout<<"Please call set_up_simualtion(strin prefix) to initialize first"<<std::endl;
         return;
     }
     alglib::real_1d_array x;
-    double epsg = 1e-8;
+    double epsg = 0;
     double epsf = 0;
     double epsx = 0;
     double stpmax = 0;
@@ -155,6 +154,8 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
 
 void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df)
 {
+    _itr_times++;
+    std::cout<<_itr_times<<std::endl;
     if(x.length()%3!=0)
     {
         std::cout<<"Error!"<<std::endl;
@@ -174,6 +175,7 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
     }
     std::unique_ptr<ShellEnergy> op_shell;
     op_shell = std::make_unique<ShellEnergyWithSwellRatio>();
+    op_shell->_ratio=ratio;
     auto op_external = std::make_unique<ExternalEnergy>();
     double E_streching(0), E_external(0), E_bending(0);
     Eigen::VectorXd diff_f_streching,diff_f_external,diff_f_bending;
@@ -194,9 +196,19 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
 //            df[3*p_fixed_index[i]+j]=0;
 //        }
 //    }
-    std::cout<<E_streching + E_bending + E_external<<std::endl;
-    std::cout<<(diff_f_bending+diff_f_streching).norm()<<std::endl;
+    std::cout<<"Streching: "<<E_streching<<"  Bending: "<<E_bending<<std::endl;
+    std::cout<<"Streching Gradient: "<<diff_f_streching.norm()<<"  Bending Gradient: "<<diff_f_bending.norm()<<std::endl;
 //    std::cout<<(diff_f_external).norm()<<std::endl;
+}
+
+void ShellSimulation::add_noise()
+{
+    // Add some noise to the z coordinates
+    srand((unsigned)time(NULL));
+    for(int i=0;i<VU.rows();i++)
+    {
+        VU(i,2) = (1e-6*rand())/RAND_MAX;
+    }
 }
 
 

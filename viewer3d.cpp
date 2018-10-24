@@ -5,6 +5,9 @@
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
 #include <imgui/imgui.h>
 
+#ifndef IT_NUM
+#define IT_NUM 10
+#endif
 
 auto op = std::make_unique<ShellSimulation>();
 Eigen::MatrixXd V;
@@ -48,10 +51,10 @@ int main(int argc, char *argv[])
         std::cerr << "Couldn't load problem: " << problem << std::endl;
         return -1;
     }
-  // igl::readOBJ("/Users/chenzhen/UT/Research/Results_Etienne_plate.obj", V, F);
   //op->compute_deformed_surface(V, F);
     
     reset();
+    //igl::readOBJ("/Users/chenzhen/UT/Research/Results/rect_with_noise.obj", V, F);
     //op->compute_deformed_surface(V, F);
     igl::opengl::glfw::Viewer viewer;
     
@@ -75,7 +78,14 @@ int main(int argc, char *argv[])
             }
             if (ImGui::Button("Optimize Some Step", ImVec2(-1,0)))
             {
-                op->compute_deformed_surface(V,F);
+                op->add_noise();
+                for(int i=0;i<IT_NUM;i++)
+                {
+                    double ratio = (i+1)*1.0/IT_NUM;
+                    op->ratio = ratio;
+                    std::cout<<ratio<<std::endl;
+                    op->compute_deformed_surface(V,F);
+                }
                 repaint(viewer);
                 std::cout<<"Finished"<<std::endl;
             }

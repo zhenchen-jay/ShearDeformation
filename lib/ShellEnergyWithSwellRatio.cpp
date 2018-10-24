@@ -34,8 +34,8 @@ void ShellEnergyWithSwellRatio::streching_energy(Eigen::MatrixXd V, Eigen::Matri
         GeoFeature::calculate_first_fundamental_form(V.row(F(i,0)),V.row(F(i,1)),V.row(F(i,2)),I_D);
         GeoFeature::calculate_first_fundamental_form(V0.row(F(i,0)),V0.row(F(i,1)),V0.row(F(i,2)),I_U);
         Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
-        double omega = compute_omega(1, barycenter(0), barycenter(1), 1.0/sqrt(2));
-        I_U = (0.8 + 0.2*omega) * I_U;
+        double omega = compute_omega(0.025, barycenter(0), barycenter(1), 1.0/sqrt(2));
+        I_U = ((1-_ratio) + _ratio*omega) * I_U;
         double dA = sqrt(I_U.determinant())/2.0; // 1/2 is the area of the parametric space
         dA_list.push_back(dA);
         IU_list.push_back(I_U);
@@ -101,8 +101,8 @@ void ShellEnergyWithSwellRatio::bending_energy(Eigen::MatrixXd V, Eigen::MatrixX
         Eigen::Matrix2d I_U, II_U, II_D;
         GeoFeature::calculate_first_fundamental_form(V0.row(F(i,0)),V0.row(F(i,1)),V0.row(F(i,2)),I_U);
         Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
-        double omega = compute_omega(1, barycenter(0), barycenter(1), 1.0/sqrt(2));
-        I_U = (0.8 + 0.2*omega) * I_U;
+        double omega = compute_omega(0.025, barycenter(0), barycenter(1), 1.0/sqrt(2));
+        I_U = ((1-_ratio) + _ratio*omega) * I_U;
         double dA = sqrt(I_U.determinant())/2.0; // 1/2 is the area of the parametric space
         dA_list.push_back(dA);
         IU_list.push_back(I_U);
@@ -170,7 +170,6 @@ void ShellEnergyWithSwellRatio::bending_energy(Eigen::MatrixXd V, Eigen::MatrixX
                 dE(3 * i + k) = dE(3 * i + k) + 1.0 / 6.0 * pow(thickness,3.0) * dA_list[f] *
                 (0.5 * alpha * Q.trace() * dQ[k].trace() +
                  beta * (Q * dQ[k]).trace());
-                
             }
             
             if(TT(f,(fi+1)%3)!=-1) // Doesn't belong to the boundary
@@ -202,7 +201,6 @@ void ShellEnergyWithSwellRatio::bending_energy(Eigen::MatrixXd V, Eigen::MatrixX
                     dE(3 * i + k) = dE(3 * i + k) + 1.0 / 6.0 * pow(thickness,3.0) * dA_list[fa] *
                     (0.5 * alpha * Q.trace() * dQ[k].trace() +
                      beta * (Q * dQ[k]).trace());
-                    
                 }
             }
         }
@@ -211,13 +209,14 @@ void ShellEnergyWithSwellRatio::bending_energy(Eigen::MatrixXd V, Eigen::MatrixX
 
 double ShellEnergyWithSwellRatio::compute_omega(double radius, double x, double y, double modulus)
 {
-    std::complex<double> point(x/radius, y/radius);
-//    std::cout<<boost::math::jacobi_sn(1.0/sqrt(2), point);
-    std::complex<double> sn,cn,dn;
-    double err;
-    jacobi_sn_cn_dn(point, modulus, sn, cn, dn, err);
-    double omega = 2 * pow(std::norm(dn*sn),2) / pow(1+pow(std::norm(cn),2),2);
-    return omega;
+//    std::complex<double> point(x/radius, y/radius);
+////    std::cout<<boost::math::jacobi_sn(1.0/sqrt(2), point);
+//    std::complex<double> sn,cn,dn;
+//    double err;
+//    jacobi_sn_cn_dn(point, modulus, sn, cn, dn, err);
+//    double omega = 2 * pow(std::norm(dn*sn),2) / pow(1+pow(std::norm(cn),2),2);
+//    return omega;
+return 16.0*pow(radius,4.0) / pow(4*radius*radius + x*x + y*y,2.0);
 }
 
 void ShellEnergyWithSwellRatio::test_bending_energy()

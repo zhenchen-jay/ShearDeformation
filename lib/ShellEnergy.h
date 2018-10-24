@@ -49,6 +49,9 @@ public:
      */
 
     virtual void test_bending_energy()=0;
+    
+public:
+    double _ratio;
 };
 
 #endif //SHEARDEFORMATION_SHELLENERGY_H
