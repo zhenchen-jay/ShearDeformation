@@ -52,6 +52,7 @@ public:
     
 public:
     double _ratio;
+    Eigen::VectorXd _omega_list;
 };
 
 #endif //SHEARDEFORMATION_SHELLENERGY_H

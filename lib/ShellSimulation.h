@@ -56,6 +56,7 @@ public:
     std::vector<int> p_fixed_index;
     std::vector<Eigen::Vector3d> external_force;
     double ratio;
+    Eigen::VectorXd _omega_list;
     
 private:
     bool _is_initialized;

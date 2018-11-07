@@ -37,7 +37,10 @@ add_library(lib
         MeshConnection.h
         MeshConnection.cpp
         elliptic_functions.cpp
-        elliptic_functions.h)
+        elliptic_functions.h
+        ComputeCoefficient.cpp
+        ComputeCoefficient.h
+	eiquadprog.h)
 
 set_target_properties(lib PROPERTIES CXX_STANDARD 14)
 set_target_properties(lib PROPERTIES CXX_STANDARD_REQUIRED ON)

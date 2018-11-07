@@ -50,6 +50,8 @@ public:
 private:
     double compute_omega(double radius, double x, double y, double modulus);
     
+    
+    
 };
 
 

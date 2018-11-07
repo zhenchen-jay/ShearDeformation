@@ -12,6 +12,7 @@
 #include "ShellEnergyWithSwellRatio.h"
 #include "GeometryFeature.h"
 #include "MeshConnection.h"
+#include "ComputeCoefficient.h"
 
 void ShellEnergyWithSwellRatio::streching_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::MatrixXi F, double YoungsModulus, double PossionRatio, double thickness, double &E, Eigen::VectorXd &dE)
 {
@@ -33,9 +34,9 @@ void ShellEnergyWithSwellRatio::streching_energy(Eigen::MatrixXd V, Eigen::Matri
         Eigen::Matrix2d I_D, I_U;
         GeoFeature::calculate_first_fundamental_form(V.row(F(i,0)),V.row(F(i,1)),V.row(F(i,2)),I_D);
         GeoFeature::calculate_first_fundamental_form(V0.row(F(i,0)),V0.row(F(i,1)),V0.row(F(i,2)),I_U);
-        Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
-        double omega = compute_omega(0.025, barycenter(0), barycenter(1), 1.0/sqrt(2));
-        I_U = ((1-_ratio) + _ratio*omega) * I_U;
+        //Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
+        //double omega = compute_omega(0.025, barycenter(0), barycenter(1), 1.0/sqrt(2));
+        I_U = ((1-_ratio) + _ratio*_omega_list(i)) * I_U;
         double dA = sqrt(I_U.determinant())/2.0; // 1/2 is the area of the parametric space
         dA_list.push_back(dA);
         IU_list.push_back(I_U);
@@ -100,9 +101,9 @@ void ShellEnergyWithSwellRatio::bending_energy(Eigen::MatrixXd V, Eigen::MatrixX
     {
         Eigen::Matrix2d I_U, II_U, II_D;
         GeoFeature::calculate_first_fundamental_form(V0.row(F(i,0)),V0.row(F(i,1)),V0.row(F(i,2)),I_U);
-        Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
-        double omega = compute_omega(0.025, barycenter(0), barycenter(1), 1.0/sqrt(2));
-        I_U = ((1-_ratio) + _ratio*omega) * I_U;
+        // Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
+        // double omega = compute_omega(0.025, barycenter(0), barycenter(1), 1.0/sqrt(2));
+        I_U = ((1-_ratio) + _ratio*_omega_list(i)) * I_U;
         double dA = sqrt(I_U.determinant())/2.0; // 1/2 is the area of the parametric space
         dA_list.push_back(dA);
         IU_list.push_back(I_U);

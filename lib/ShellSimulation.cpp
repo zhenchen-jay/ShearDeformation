@@ -1,14 +1,14 @@
 // Created by Zhen Chen on 10/3/18.
 
-
+#include <igl/readOBJ.h>
+#include <fstream>
+#include <time.h>
 #include "ShellSimulation.h"
 #include "ShellEnergy.h"
 #include "ExternalEnergy.h"
 #include "ShellEnergyStandard.h"
 #include "ShellEnergyWithSwellRatio.h"
-#include <igl/readOBJ.h>
-#include <fstream>
-#include <time.h>
+#include "ComputeCoefficient.h"
 
 void callback_func(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
 {
@@ -82,6 +82,18 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix)
     if (!mfs)
         return false;
     ratio = 0;
+    
+    Eigen::MatrixXd V0,V;
+    Eigen::MatrixXi F0,F;
+    igl::readOBJ("/Users/chenzhen/UT/Research/Results/rect_with_noise.obj", V0, F0);
+    igl::readOBJ("/Users/chenzhen/UT/Research/Results/mine_simple_3.obj", V, F);
+    auto op = std::make_unique<ComputeCoefficient>();
+    _omega_list = op->find_optimal_sol(V0, V, F, _YoungsModulus, _PoissonsRatio, _thickness, 1e-5, 10);
+    for(int i=0;i<_omega_list.size();i++)
+    {
+        _omega_list(i) = 1.0/_omega_list(i);
+    }
+    
     _is_initialized = true;
     
     return true;
@@ -95,6 +107,7 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
         std::cout<<"Please call set_up_simualtion(strin prefix) to initialize first"<<std::endl;
         return;
     }
+    
     alglib::real_1d_array x;
     double epsg = 0;
     double epsf = 0;
@@ -176,6 +189,7 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
     std::unique_ptr<ShellEnergy> op_shell;
     op_shell = std::make_unique<ShellEnergyWithSwellRatio>();
     op_shell->_ratio=ratio;
+    op_shell->_omega_list = _omega_list;
     auto op_external = std::make_unique<ExternalEnergy>();
     double E_streching(0), E_external(0), E_bending(0);
     Eigen::VectorXd diff_f_streching,diff_f_external,diff_f_bending;

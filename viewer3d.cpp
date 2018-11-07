@@ -4,6 +4,7 @@
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
 #include <imgui/imgui.h>
+#include "lib/ComputeCoefficient.h"
 
 #ifndef IT_NUM
 #define IT_NUM 10
@@ -54,7 +55,8 @@ int main(int argc, char *argv[])
   //op->compute_deformed_surface(V, F);
     
     reset();
-    //igl::readOBJ("/Users/chenzhen/UT/Research/Results/rect_with_noise.obj", V, F);
+    igl::readOBJ("/Users/chenzhen/UT/Research/Results/rect_with_noise.obj", V, F);
+    
     //op->compute_deformed_surface(V, F);
     igl::opengl::glfw::Viewer viewer;
     
@@ -78,7 +80,7 @@ int main(int argc, char *argv[])
             }
             if (ImGui::Button("Optimize Some Step", ImVec2(-1,0)))
             {
-                op->add_noise();
+                //op->add_noise();
                 for(int i=0;i<IT_NUM;i++)
                 {
                     double ratio = (i+1)*1.0/IT_NUM;
