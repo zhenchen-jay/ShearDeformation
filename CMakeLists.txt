@@ -36,10 +36,9 @@ option(LIBIGL_WITH_XML               "Use XML"            OFF)
 
 
 find_package(LIBIGL REQUIRED)
-find_package(Eigen3 REQUIRED)
 
 # Add include files for libigl and Eigen
-include_directories( ${LIBIGL_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} )
+include_directories( ${LIBIGL_INCLUDE_DIR} )
 
 # Self-defined libs
 add_subdirectory(lib)
