@@ -34,6 +34,7 @@ public:
      */
     
     void test();
+    void test_libigl();
     
 private:
     //void construct_LS(Eigen::MatrixXd V0, Eigen::MatrixXd V, Eigen::MatrixXi F, Eigen::SparseMatrix<double> &A, Eigen::VectorXd &b, double YoungsModulus, double PoissonRatio, double thickness);

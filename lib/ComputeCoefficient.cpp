@@ -2,12 +2,20 @@
 // Created by Zhen Chen on 11/2/18.
 //
 #include <igl/readOBJ.h>
+#include <igl/active_set.h>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <cmath>
 #include "ComputeCoefficient.h"
 #include "GeometryFeature.h"
 #include "MeshConnection.h"
-#include "eiquadprog.h"
+#include "Equadprog.h"
+#include "LSQR.h"
+#include "ShellEnergyWithSwellRatio.h"
+#include "external/LSQR/lsqrDense.h"
+#include "external/LSQR/lsmrDense.h"
+
 
 void ComputeCoefficient::construct_LS(Eigen::MatrixXd V0, Eigen::MatrixXd V, Eigen::MatrixXi F, Eigen::MatrixXd &A, Eigen::VectorXd &b, double YoungsModulus, double PoissonRatio, double thickness)
 {
@@ -189,31 +197,87 @@ Eigen::VectorXd ComputeCoefficient::find_optimal_sol(Eigen::MatrixXd V0, Eigen::
     Eigen::MatrixXd A;
     Eigen::VectorXd b;
     construct_LS(V0, V, F, A, b, YonungsModulus, PoissonRatio, thickness);
-    Eigen::MatrixXd G,CE,CI;
-    Eigen::VectorXd g0,ce0,ci0,optimal_sol;
+    
+    Eigen::MatrixXd normalized_D(A.rows(),A.rows());
+    for(int i=0;i<A.rows();i++)
+    {
+        A.row(i) = A.row(i)/A.row(i).norm();
+        normalized_D(i,i) = 1/A.row(i).norm();
+    }
+    b = normalized_D*b;
+    
+    Eigen::MatrixXd G,CE(A.cols(),0),CI(A.cols(), 2*A.cols());
+    Eigen::VectorXd g0,ce0(0,1),ci0(2*A.cols()),optimal_sol;
     G = A.transpose()*A;
     g0 = -b.transpose()*A;
-    CE.resize(A.cols(), A.cols());
-    CE.setZero();
-    ce0.resize(A.cols());
-    ce0.setZero();
+//     check whether the matrix G is strictly positve definite
+//    Eigen::VectorXcd eig_vec =  G.eigenvalues();
+//    bool is_positive = true;
+//    for(int i=0;i<eig_vec.size();i++)
+//    {
+//        if(eig_vec(i).real() < 0)
+//        {
+//            is_positive = false;
+//            break;
+//        }
+//    }
+//    std::vector<double> eig_val;
+//    for(int i=0;i<eig_vec.size();i++)
+//    {
+//        eig_val.push_back(eig_vec(i).real());
+//    }
+//    std::sort(eig_val.begin(), eig_val.end());
+//    for(int i=0;i<eig_val.size();i++)
+//        std::cout<<eig_val[i]<<std::endl;
+//    if(!is_positive)
+//    {
+//        optimal_sol.resize(A.cols());
+//        optimal_sol.setOnes();
+//        std::cout<<"The matrix is not strictly positive definite"<<std::endl;
+//        return optimal_sol;
+//    }
     
-    CI.resize(2*A.cols(), A.cols());
-    CI.setZero();
-    for(int j=0;j<CI.cols();j++)
-    {
-        CI(j,j)=1;
-        CI(j+CI.cols(),j)=1;
-    }
-    ci0.resize(2*A.cols());
-    for(int i=0;i<A.cols();i++)
-    {
-        ci0(i) = -M1;
-        ci0(i+A.cols()) = M2;
-    }
+    CI.block(0, 0, CI.rows(), CI.rows()).setIdentity();
+    CI.block(0, CI.rows(), CI.rows(), CI.rows()).setIdentity();
+    CI.block(0, CI.rows(), CI.rows(), CI.rows()) = - CI.block(0, CI.rows(), CI.rows(), CI.rows());
+    
+    ci0.block(0, 0, A.cols(), 1).setConstant(-M1);
+    ci0.block(A.cols(), 0, A.cols(), 1).setConstant(M2);
+    
     optimal_sol.resize(A.cols());
     Eigen::solve_quadprog(G, g0, CE, ce0, CI, ci0, optimal_sol);
+    //std::cout<<CI.transpose()*optimal_sol+ci0<<std::endl;
+    std::cout<<(A*optimal_sol - b).norm()<<std::endl;
     std::cout<<"found omega!!"<<std::endl;
+    //std::cout<<CI<<std::endl;
+//    int n = 2;
+//    Eigen::MatrixXd G1(n,n),CE1(0,n),CI1(2*n,n);
+//    Eigen::VectorXd g1,ce1,ci1,sol;
+//    G1.setIdentity();
+//    CI1.setZero();
+//    for(int i=0;i<CI1.cols();i++)
+//    {
+//        CI1(i,i) = 1;
+//        CI1(i+CI1.cols(),i) = -1;
+//    }
+//    ce1.resize(0);
+//    ce1.setZero();
+//    ci1.resize(2*n);
+//    for(int i=0;i<CI1.cols();i++)
+//    {
+//        ci1(i) = 1.5;
+//        ci1(i+CI1.cols()) = 1;
+//    }
+//    g1.resize(n);
+//    for(int i=0;i<g1.size();i++)
+//        g1(i) = i+1;
+//    Eigen::solve_quadprog(G1, g1, CE1.transpose(), ce1, CI1.transpose(), ci1, sol);
+//    std::cout<<sol<<std::endl;
+//
+//    Eigen::VectorXd optimal_sol;
+//    optimal_sol.resize(F.rows());
+//    optimal_sol.setOnes();
+    
     return optimal_sol;
 }
 
@@ -354,33 +418,166 @@ Eigen::VectorXd ComputeCoefficient::get_coefficient(Eigen::MatrixXd V0, Eigen::M
 
 void ComputeCoefficient::test()
 {
-    Eigen::MatrixXd V0,V;
+    std::vector<std::string> path_list(3);
+     std::vector<Eigen::MatrixXd> V(3);
+    path_list[0] = "/Users/chenzhen/UT/Research/Results/cylinder";
+    path_list[1] = "/Users/chenzhen/UT/Research/Results/hypar";
+    path_list[2] = "/Users/chenzhen/UT/Research/Results/sphere";
+    Eigen::MatrixXd V0;
     Eigen::MatrixXi F0,F;
     igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", V0, F0);
-    igl::readOBJ("/Users/chenzhen/UT/Research/Results/mine_simple_3.obj", V, F);
-    
-    Eigen::VectorXd omega_vec(F0.rows());
-    
-    // Calculate the energy
-    for(int i=0;i<F0.rows();i++)
-    {
-        Eigen::Vector3d barycenter = (V0.row(F(i,0)) + V0.row(F(i,1)) + V0.row(F(i,2)))/3.0;
-        double omega = 16.0*std::pow(0.025,4.0) / std::pow(4*0.025*0.025 + barycenter(0)*barycenter(0) + barycenter(1)*barycenter(1),2.0);
-        omega_vec(i) = 1.0/omega;
-    }
-    double thickness = 1e-4;
-    double Youngsmodulus = 1.0e4;
-    double PoissonRatio = 0.3;
-    Eigen::VectorXd coef = find_optimal_sol(V0,V,F,Youngsmodulus,PoissonRatio,thickness,1e-7,3);
-    
+    igl::readOBJ(path_list[0] + "/cylinder.obj", V[0], F);
+    igl::readOBJ(path_list[1] + "/hypar.obj", V[1], F);
+    igl::readOBJ(path_list[2] + "/sphere.obj", V[2], F);
+    double thickness = 1;
+    double Youngsmodulus = std::pow(10, 4);
+    double PoissonRatio = 0.1 * 4;
     Eigen::MatrixXd A;
     Eigen::VectorXd b;
-    construct_LS(V0, V, F, A, b, Youngsmodulus, PoissonRatio, thickness);
-    //Eigen::VectorXd coef_1 = A.fullPivHouseholderQr().solve(b);
-    std::cout<<coef<<std::endl;
-    std::cout<<omega_vec<<std::endl;
-    std::cout<<(A*coef-b).norm()<<std::endl;
-    std::cout<<(A*omega_vec-b).norm()<<std::endl;
-    std::cout<<(coef-omega_vec).norm()<<std::endl;
-    std::cout<<"finished!"<<std::endl;
+    construct_LS(V0, V[0], F, A, b, Youngsmodulus, PoissonRatio, thickness);
+    Eigen::VectorXd x0(A.cols());
+    x0.setZero();
+    Eigen::MatrixXd normalized_A;
+    normalized_A = A;
+    Eigen::MatrixXd normalized_D(A.rows(),A.rows());
+    for(int i=0;i<A.rows();i++)
+    {
+        normalized_A.row(i) = normalized_A.row(i)/normalized_A.row(i).norm();
+        normalized_D(i,i) = 1/normalized_A.row(i).norm();
+    }
+    Eigen::VectorXd normalized_b = normalized_D*b;
+    Eigen::SparseMatrix<double> A_sp = normalized_A.sparseView();
+    Eigen::VectorXd x = LSQR::LSQR_solver(A_sp, normalized_b, x0, 1e-16);
+//    std::cout<<(A_sp*x - normalized_b).norm()<<std::endl;
+    Eigen::VectorXd lx(x0.size()),ux(x0.size());
+    lx.setConstant(0.001);
+    ux.setConstant(1000);
+    Eigen::VectorXd x_op = LSQR::LSQR_solver_box_constraints(A_sp, normalized_b, x0, lx, ux, 1e-16, 1e1);
+    Eigen::VectorXd x1 = find_optimal_sol(V0, V[0], F, Youngsmodulus, PoissonRatio, thickness, 0.001, 1000);
+    
+    std::cout<<"Without any constraint: "<<std::endl;
+    std::cout<<x<<std::endl;
+    std::cout<<"The norm of gradient ||A'(Ax-b)||: "<<std::endl;
+    std::cout<<(A_sp.transpose()*(A_sp*x - normalized_b)).norm()<<std::endl;
+    std::cout<<"The norm of function ||Ax-b||: "<<std::endl;
+    std::cout<<(A_sp*x - normalized_b).norm()<<std::endl;
+    
+    std::cout<<"LSMR: "<<std::endl;
+    std::cout<<x_op<<std::endl;
+    std::cout<<"The norm of gradient ||A'(Ax-b)||: "<<std::endl;
+    std::cout<<(A_sp.transpose()*(A_sp*x_op - normalized_b)).norm()<<std::endl;
+    std::cout<<"The norm of function ||Ax-b||: "<<std::endl;
+    std::cout<<(A_sp*x_op - normalized_b).norm()<<std::endl;
+    
+    std::cout<<"QuadProg: "<<std::endl;
+    std::cout<<x1<<std::endl;
+    std::cout<<"The norm of gradient ||A'(Ax-b)||: "<<std::endl;
+    std::cout<<(A_sp.transpose()*(A_sp*x1 - normalized_b)).norm()<<std::endl;
+    std::cout<<"The norm of function ||Ax-b||: "<<std::endl;
+    std::cout<<(A_sp*x1 - normalized_b).norm()<<std::endl;
+    
+    
+    
+//
+//    Eigen::MatrixXd test_A(10, 10);
+//    Eigen::VectorXd test_b(10);
+//    Eigen::VectorXd test_ini(10);
+//    test_ini.setZero();
+//    test_A.setZero();
+//    for(int i=0;i<test_b.size();i++)
+//    {
+//        test_A(i,i) = 1;
+//        test_b(i) = i+1;
+//    }
+//    Eigen::VectorXd test_lx(test_b.size()),test_ux(test_b.size());
+//    test_lx.setConstant(2);
+//    test_ux.setConstant(5);
+//    Eigen::SparseMatrix<double> sp_test = test_A.sparseView();
+//    Eigen::VectorXd test_x = LSQR::LSQR_solver_box_constraints(sp_test, test_b, test_ini, test_lx, test_ux, 1e-16, 1e1);
+//
+//    std::cout<<test_x<<std::endl;
+    
+   // std::cout<<x1<<std::endl;
+    
+    
+//    for(int i=0;i<V.size();i++)         // loop for meshes
+//        for(int j = -4;j<=0;j++)        // loop for thickness
+//            for(int k=4;k<=9;k++)       // loop for Young's Modulus
+//                for(int r = 1;r<=4;r++) // loop for PoissonRatio
+//                {
+//                    double thickness = std::pow(10, j);
+//                    double Youngsmodulus = std::pow(10, k);
+//                    double PoissonRatio = 0.1 * r;
+//                    std::cout<<"Mesh "<<i<<std::endl;
+//                    std::cout<<"Thickness: "<<thickness<<"  "<<"Poisson Ratio: "<<PoissonRatio<<"  "<<"YongsModulus: "<<Youngsmodulus<<std::endl;
+//                    Eigen::MatrixXd A;
+//                    Eigen::VectorXd b;
+//                    construct_LS(V0, V[i], F, A, b, Youngsmodulus, PoissonRatio, thickness);
+//
+//                    Eigen::MatrixXd G = A.transpose()*A;
+//
+//                    Eigen::VectorXcd eig_vec =  G.eigenvalues();
+//                    std::vector<double> eig_val;
+//                    for(int i=0;i<eig_vec.size();i++)
+//                    {
+//                        eig_val.push_back(eig_vec(i).real());
+//                    }
+//                    std::sort(eig_val.begin(), eig_val.end());
+//                    std::ofstream outfile(path_list[i] +"/eigen_value"+"_t_" + std::to_string(abs(j))+ "_y_" + std::to_string(k) + "_p_" + std::to_string(r)+".dat",std::ofstream::app);
+//                    for(int i=0;i<eig_val.size();i++)
+//                    {
+//                        outfile<<std::setprecision(16)<<eig_val[i]<<"\n";
+//                    }
+//                    outfile<<"Condition Number"<<"\n";
+//                    outfile<<eig_val[eig_val.size()-1]/eig_val[0];
+//                    outfile.close();
+//                }
+//
+//    std::cout<<A*coef-b<<std::endl<<std::endl;
+//    auto op = std::make_unique<ShellEnergyWithSwellRatio>();
+//    double Es,Eb;
+//    Eigen::VectorXd dEs, dEb;
+//    op->_ratio = 1;
+//    op->_omega_list = coef;
+//    for(int i=0;i<coef.size();i++)
+//    {
+//        op->_omega_list(i) = 1.0 / op->_omega_list(i);
+//    }
+//    op->streching_energy(V, V0, F, Youngsmodulus, PoissonRatio, thickness, Es, dEs);
+//    op->bending_energy(V, V0, F, Youngsmodulus, PoissonRatio, thickness, Eb, dEb);
+//    std::cout<<"The Exact One"<<std::endl;
+//    std::cout<<dEs + dEb<<std::endl;
+//    std::cout<<"Error:"<<std::endl;
+//    std::cout<<(A*coef - b - dEs - dEb).norm()<<std::endl;
+    
+}
+
+void ComputeCoefficient::test_libigl()
+{
+        int n = 2;
+        Eigen::SparseMatrix<double> Aeq(0,n), Aieq(0,n);
+        Eigen::VectorXd Beq(0,1), Bieq(0,1);
+        Eigen::VectorXd lx(n),ux(n),b(1,1),bc(1,1),optimal_sol(n);
+    
+        b(0) = 0;
+        bc(0) = 1;
+    
+        lx.setConstant(-1.5);
+        ux.setConstant(1);
+    
+        optimal_sol.setOnes();
+    
+        igl::active_set_params as;
+        as.Auu_pd = true;
+    
+        Eigen::SparseMatrix<double> Q(n,n);
+        Q.setIdentity();
+        // std::cout<<known_value.cols()<<std::endl;
+        Eigen::VectorXd B;
+        B.resize(n);
+        B << 1,2;
+    
+        //igl::active_set(Q, B, b, bc, Aeq, Beq, Aieq, Bieq, lx, ux, as, optimal_sol);
+        std::cout<<optimal_sol<<std::endl;
+
 }

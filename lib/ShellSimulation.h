@@ -20,7 +20,7 @@ public:
 public:
     void add_noise();
     
-    bool set_up_simulation(const std::string &prefix);
+    bool set_up_simulation(const std::string &prefix, const std::string tar_shape);
     
     void energy_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df);
     /*

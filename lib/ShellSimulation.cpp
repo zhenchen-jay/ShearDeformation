@@ -1,6 +1,7 @@
 // Created by Zhen Chen on 10/3/18.
 
 #include <igl/readOBJ.h>
+#include <igl/writeOBJ.h>
 #include <fstream>
 #include <time.h>
 #include "ShellSimulation.h"
@@ -9,6 +10,10 @@
 #include "ShellEnergyStandard.h"
 #include "ShellEnergyWithSwellRatio.h"
 #include "ComputeCoefficient.h"
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <iomanip> 
 
 void callback_func(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
 {
@@ -16,7 +21,7 @@ void callback_func(const alglib::real_1d_array &x, double &f, alglib::real_1d_ar
     callback->energy_func_grad(x,f,df);
 }
 
-bool ShellSimulation::set_up_simulation(const std::string &prefix)
+bool ShellSimulation::set_up_simulation(const std::string &prefix, const std::string tar_shape)
 {
     std::string meshName = prefix + std::string("_geometry.obj");
     if (!igl::readOBJ(meshName, VU, F))
@@ -83,17 +88,33 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix)
         return false;
     ratio = 0;
     
-    Eigen::MatrixXd V0,V;
-    Eigen::MatrixXi F0,F;
-    igl::readOBJ("/Users/chenzhen/UT/Research/Results/rect_with_noise.obj", V0, F0);
-    igl::readOBJ("/Users/chenzhen/UT/Research/Results/mine_simple_3.obj", V, F);
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F1;
+    igl::readOBJ(tar_shape + "/cylinder.obj", V, F1);
     auto op = std::make_unique<ComputeCoefficient>();
-    _omega_list = op->find_optimal_sol(V0, V, F, _YoungsModulus, _PoissonsRatio, _thickness, 1e-5, 10);
+//    std::string filename = "/Users/chenzhen/UT/Research/Results/omega_list_cylinder.dat";
+//    std::ifstream ifs_1(filename);
+//    _omega_list.resize(F.rows());
+//    for(int i=0;i<F.rows();i++)
+//    {
+//        double value;
+//        ifs_1 >> value;
+//        std::cout<<value<<std::endl;
+//        _omega_list(i) = value;
+//    }
+    _omega_list = op->find_optimal_sol(VU, V, F, _YoungsModulus, _PoissonsRatio, _thickness, 1e-5, 1000);
     for(int i=0;i<_omega_list.size();i++)
     {
         _omega_list(i) = 1.0/_omega_list(i);
     }
-    
+    std::cout<<_omega_list<<std::endl;
+    std::ofstream outfile(tar_shape + "/omega_list_test.dat",std::ios::trunc);
+    for(int i=0;i<_omega_list.size()-1;i++)
+    {
+            outfile<<std::setprecision(16)<<_omega_list[i]<<"\n";
+    }
+    outfile<<std::setprecision(16)<<_omega_list[_omega_list.size()-1];
+    outfile.close();
     _is_initialized = true;
     
     return true;
@@ -109,7 +130,7 @@ void ShellSimulation::compute_deformed_surface(Eigen::MatrixXd &V, Eigen::Matrix
     }
     
     alglib::real_1d_array x;
-    double epsg = 0;
+    double epsg = 1e-6;
     double epsf = 0;
     double epsx = 0;
     double stpmax = 0;

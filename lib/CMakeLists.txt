@@ -40,7 +40,10 @@ add_library(lib
         elliptic_functions.h
         ComputeCoefficient.cpp
         ComputeCoefficient.h
-	eiquadprog.h)
+	Equadprog.h
+	Equadprog.cpp
+	LSQR.h
+	LSQR.cpp)
 
 set_target_properties(lib PROPERTIES CXX_STANDARD 14)
 set_target_properties(lib PROPERTIES CXX_STANDARD_REQUIRED ON)

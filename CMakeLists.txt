@@ -44,10 +44,11 @@ include_directories( ${LIBIGL_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} )
 # Self-defined libs
 add_subdirectory(lib)
 add_subdirectory(external/alglib)
+add_subdirectory(external/LSQR)
 
 # Add your project files
 file(GLOB SRCFILES *.cpp)
 add_executable(${PROJECT_NAME}_bin ${SRCFILES} viewer3d.cpp)
-target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw igl::opengl_glfw_imgui lib alglib)
+target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw igl::opengl_glfw_imgui lib alglib lsqr)
 
 ################################################################################
