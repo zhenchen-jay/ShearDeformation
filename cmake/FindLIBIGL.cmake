@@ -7,7 +7,7 @@ if(LIBIGL_FOUND)
     return()
 endif()
 
-find_path(LIBIGL_INCLUDE_DIR include/igl/readOBJ.h
+find_path(LIBIGL_INCLUDE_DIR igl/readOBJ.h
     HINTS
         ENV LIBIGL
         ENV LIBIGLROOT
