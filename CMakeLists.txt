@@ -36,6 +36,8 @@ option(LIBIGL_WITH_XML               "Use XML"            OFF)
 
 
 find_package(LIBIGL REQUIRED)
+message("Found LibIGL at ${LIBIGL_INCLUDE_DIR} from $ENV(LIBIGL}")
+
 
 # Add include files for libigl and Eigen
 include_directories( ${LIBIGL_INCLUDE_DIR} )
