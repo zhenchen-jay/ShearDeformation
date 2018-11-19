@@ -19,7 +19,6 @@ From within the `build` directory just issue:
 
     ./ShearDeformation_bin
 
-A glfw app should launch displaying a 3D cube.
 
 ## Dependencies
 
