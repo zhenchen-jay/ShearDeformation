@@ -13,7 +13,6 @@ cmake_minimum_required(VERSION 3.3)
 # Required libraries
 ################################################################################
 
-find_package(LIBIGL REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
 

@@ -1,11 +1,19 @@
+#define VISUALIZATION 0 
+
+#if VISUALIZATION
 #include <igl/opengl/glfw/Viewer.h>
-#include "lib/ShellEnergy.h"
-#include "lib/ShellSimulation.h"
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
 #include <imgui/imgui.h>
+#endif
+
+#include "lib/ShellEnergy.h"
+#include "lib/ShellSimulation.h"
 #include "lib/ComputeCoefficient.h"
 #include "lib/FindFirstFundamentalCoef.h"
+#include <memory>
+#include <igl/readOBJ.h>
+#include <igl/writeOBJ.h>
 
 #ifndef IT_NUM
 #define IT_NUM 10
@@ -24,6 +32,7 @@ void reset()
     
 }
 
+#if VISUALIZATION
 void repaint(igl::opengl::glfw::Viewer &viewer)
 {
         viewer.data().clear();
@@ -40,12 +49,13 @@ void repaint(igl::opengl::glfw::Viewer &viewer)
         }
         viewer.data().set_colors(colors);
 }
+#endif
 
 void compute_hypar()
 {
     Eigen::MatrixXd Vo;
     Eigen::MatrixXi Fo;
-    igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", Vo, Fo);
+    igl::readOBJ("../benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", Vo, Fo);
     for(int i=0;i<Vo.rows();i++)
     {
         Vo(i,2) = 16*Vo(i,1) * Vo(i,0);
@@ -57,7 +67,7 @@ void compute_cylinder()
 {
     Eigen::MatrixXd Vo;
     Eigen::MatrixXi Fo;
-    igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", Vo, Fo);
+    igl::readOBJ("../benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", Vo, Fo);
     for(int i=0;i<Vo.rows();i++)
     {
         /*

@@ -24,7 +24,7 @@ namespace GeoFeature
      */
     
     
-    void calculate_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Matrix2d &I);
+    void calculate_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Matrix2d &);
     
     /*
      This function calculates the corresponding matrix of the first fundamental form with the parametric space span{(0,0),(1,0) (0,1)}

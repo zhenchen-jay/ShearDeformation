@@ -2,6 +2,7 @@
 // Created by Zhen Chen on 10/20/18.
 //
 
+#if 0
 #ifndef PROJECT_ELLIPTIC_FUNCTIONS_H
 #define PROJECT_ELLIPTIC_FUNCTIONS_H
 #include <complex.h>
@@ -13,3 +14,4 @@ void jacobi_sn_cn_dn(double u, double m, double &sn, double &cn, double &dn, dou
 void jacobi_sn_cn_dn(std::complex<double> u, double m, std::complex<double> &sn, std::complex<double> &cn, std::complex<double> &dn, double &err);
 
 #endif //PROJECT_ELLIPTIC_FUNCTIONS_H
+#endif

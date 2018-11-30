@@ -2,6 +2,7 @@
 #include "external/LSQR/lsqrDense.h"
 #include "external/LSQR/lsmrDense.h"
 #include <iostream>
+#include <memory>
 using namespace Eigen;
 #ifndef MAX_ITR_TIME
 #define MAX_ITR_TIME 1e1

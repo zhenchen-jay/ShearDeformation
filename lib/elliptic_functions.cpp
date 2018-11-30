@@ -1,6 +1,7 @@
 //
 // Created by Zhen Chen on 10/20/18.
 //
+#if 0
 #include "elliptic_functions.h"
 #include <boost/math/special_functions/jacobi_elliptic.hpp>
 #include <iostream>
@@ -110,3 +111,4 @@ void jacobi_sn_cn_dn(std::complex<double> u, double m, std::complex<double> &sn,
     }
     return;
 }
+#endif

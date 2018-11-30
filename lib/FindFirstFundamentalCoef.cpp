@@ -359,8 +359,8 @@ void FindFirstFundamentalCoef::test_func_grad()
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
     
-    igl::readOBJ("/Users/chenzhen/UT/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", V0, F0);
-    igl::readOBJ("/Users/chenzhen/UT/Research/Results/cylinder/cylinder.obj", V, F);
+    igl::readOBJ("../benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", V0, F0);
+    igl::readOBJ("../benchmarks/Results/cylinder/cylinder.obj", V, F);
     double E, E1;
     Eigen::VectorXd dE, dE1;
     Eigen::VectorXd x(F.rows()*3);

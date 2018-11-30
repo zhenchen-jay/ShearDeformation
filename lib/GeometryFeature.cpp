@@ -47,12 +47,12 @@ void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vect
     
 }
 
-void GeoFeature::calculate_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2,Eigen::Matrix2d &I)
+void GeoFeature::calculate_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2,Eigen::Matrix2d &Form1)
 {
-    I(0,0) = (V1-V0).dot(V1-V0);
-    I(1,0) = (V1-V0).dot(V2-V0);
-    I(0,1) = (V1-V0).dot(V2-V0);
-    I(1,1) = (V2-V0).dot(V2-V0);
+    Form1(0,0) = (V1-V0).dot(V1-V0);
+    Form1(1,0) = (V1-V0).dot(V2-V0);
+    Form1(0,1) = (V1-V0).dot(V2-V0);
+    Form1(1,1) = (V2-V0).dot(V2-V0);
 }
 
 void GeoFeature::diff_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, int start_ind,std::vector<Eigen::Matrix2d> &dI)
