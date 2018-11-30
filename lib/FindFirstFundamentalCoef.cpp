@@ -268,7 +268,7 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
     grad_vec_f.setZero();
     Eigen::Matrix2d Id;
     Id.setIdentity();
-    for(int i=0;i<V.size();i++)
+    for(int i=0;i<V.rows();i++)
     {
         // The terms coming from the first fundamental form
         for(int j=0;j<dID_index[i].size();j++)
