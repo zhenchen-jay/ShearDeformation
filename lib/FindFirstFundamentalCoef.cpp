@@ -265,13 +265,16 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
     f = 0.5*vec_f.transpose()*vec_f;
     
     // Get the gradient
+    std::cout<<"Get the gradient"<<std::endl;
     Eigen::SparseMatrix<double> grad_vec_f(vec_f.size(),3*F.rows());
     grad_vec_f.setZero();
     Eigen::Matrix2d Id;
     Id.setIdentity();
     for(int i=0;i<V.rows();i++)
     {
+        std::cout<<"Vertex "<<i<<std::endl;
         // The terms coming from the first fundamental form
+        std::cout<<"First Fundamental form term"<<std::endl;
         for(int j=0;j<dID_index[i].size();j++)
         {
             int f = dID_index[i][j];
@@ -310,6 +313,7 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
         }
         
         // The terms coming from the second fundamental form
+        std::cout<<"Second fundemental form"<<std::endl;
         for(int j=0;j<dIID_index[i].size();j++)
         {
             int f = dIID_index[i][j];
@@ -349,6 +353,7 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
         
     }
     df = grad_vec_f.transpose()*vec_f;
+    std::cout<<"Finished!"<<std::endl;
 }
 
 void FindFirstFundamentalCoef::test_func_grad()
@@ -360,8 +365,8 @@ void FindFirstFundamentalCoef::test_func_grad()
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
     
-    igl::readOBJ("/Users/chenzhen/UT/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", V0, F0);
-    igl::readOBJ("/Users/chenzhen/UT/Research/Results/cylinder/cylinder.obj", V, F);
+    igl::readOBJ("/u/zchen96/ZhenChen/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", V0, F0);
+    igl::readOBJ("/u/zchen96/ZhenChen/Projects/ShearDeformation/benchmarks/cylinder.obj", V, F);
     double E, E1;
     Eigen::VectorXd dE, dE1;
     Eigen::VectorXd x(F.rows()*3);
@@ -376,10 +381,14 @@ void FindFirstFundamentalCoef::test_func_grad()
     set_up(V, F, YoungsModulus, PossionRatio, thickness);
     Eigen::VectorXd x1= x;
     get_func_grad(x, E, dE);
+    std::cout<<E<<std::endl;
     srand((unsigned)time(NULL));
     int selected_i = rand()%(F.rows()*3);
+    std::cout<<1<<std::endl;
     Eigen::VectorXd eps(F.rows()*3);
+    std::cout<<2<<std::endl;
     eps.setZero();
+    std::cout<<3<<std::endl;
     for(int k=4;k<8;k++)
     {
         std::cout<<k<<std::endl;
