@@ -13,7 +13,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <iomanip> 
+#include <iomanip>
+#include <memory>
 
 void callback_func(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
 {

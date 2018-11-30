@@ -6,6 +6,7 @@
 #include <imgui/imgui.h>
 #include "lib/ComputeCoefficient.h"
 #include "lib/FindFirstFundamentalCoef.h"
+#include <memory>
 
 #ifndef IT_NUM
 #define IT_NUM 10

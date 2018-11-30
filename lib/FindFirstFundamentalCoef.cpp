@@ -2,6 +2,7 @@
 #include <igl/readOBJ.h>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <vector>
 #include "FindFirstFundamentalCoef.h"
 #include "GeometryFeature.h"
@@ -26,7 +27,7 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
         MeshConnection::triangle_triangle_adjacency(F, TT, TTi);
         ID_list.assign(F.rows(), Eigen::Matrix2d());
         IID_list.assign(F.rows(), Eigen::Matrix2d());
-        
+
         // Get the basic variables
         std::vector<int> index(3);
         std::vector<Eigen::Vector3d> adjacent_points(3);
@@ -38,8 +39,8 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
             Eigen::Matrix2d I_D, II_D;
             GeoFeature::calculate_first_fundamental_form(V.row(F(i,0)),V.row(F(i,1)),V.row(F(i,2)),I_D);
             ID_list[i]=I_D;
-            
-            
+
+
             // Second fundamental form
             for(int k=0;k<3;k++)
             {
@@ -57,7 +58,7 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
                     real_pts[(k+2)%3] = false;
                 }
             }
-            
+
             GeoFeature::calculate_second_fundamental_form(V.row(F(i,0)), V.row(F(i,1)), V.row(F(i,2)), adjacent_points[0], adjacent_points[1], adjacent_points[2], real_pts, II_D);
             IID_list[i]=II_D;
         }
@@ -82,7 +83,7 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
                     dID_list.coeffRef(3*i+r, 4*f+3) += dI[r](1,1);
                 }
             }
-                
+
         }
         for(int i=0;i<V.rows();i++)
         {
@@ -107,7 +108,7 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
                     }
                 }
                 GeoFeature::diff_second_fundamental_form(V.row(F(f, 0)), V.row(F(f, 1)), V.row(F(f, 2)), adjacent_points[0], adjacent_points[1], adjacent_points[2], fi, real_pts, dII);
-                
+
                 for(int r = 0;r<3;r++)
                 {
                     dIID_list.coeffRef(3*i+r, 4*f) += dII[r](0,0);
@@ -115,7 +116,7 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
                     dIID_list.coeffRef(3*i+r, 4*f+2) += dII[r](1,0);
                     dIID_list.coeffRef(3*i+r, 4*f+3) += dII[r](1,1);
                 }
-                
+
                 if(TT(f,(fi+1)%3)!=-1) // Doesn't belong to the boundary
                 {
                     int fa = TT(f,(fi+1)%3);
@@ -268,7 +269,7 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
     grad_vec_f.setZero();
     Eigen::Matrix2d Id;
     Id.setIdentity();
-    for(int i=0;i<V.size();i++)
+    for(int i=0;i<V.rows();i++)
     {
         // The terms coming from the first fundamental form
         for(int j=0;j<dID_index[i].size();j++)

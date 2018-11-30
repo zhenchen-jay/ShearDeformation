@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 #include <cmath>
+#include <memory>
 #include "ComputeCoefficient.h"
 #include "GeometryFeature.h"
 #include "MeshConnection.h"
