@@ -1,5 +1,5 @@
 //
-// Created by 陈臻 on 10/19/18.
+// Created by Zhen Chen on 10/19/18.
 //
 
 #ifndef SHEARDEFORMATION_SHELLENERGYWITHSWELLRATIO_H

@@ -9,15 +9,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c83c9fa7-97ef-42aa-a532-40cbe800d519" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/lib/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/ComputeCoefficient.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ComputeCoefficient.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/ComputeCoefficient.h" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ComputeCoefficient.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/ShellSimulation.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ShellSimulation.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/ShellSimulation.h" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ShellSimulation.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/eiquadprog.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/viewer3d.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/viewer3d.cpp" afterDir="false" />
-    </list>
+    <list default="true" id="c83c9fa7-97ef-42aa-a532-40cbe800d519" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-release/" />
     <ignored path="$PROJECT_DIR$/lib/cmake-build-debug/" />
@@ -51,14 +43,14 @@
     <session id="1705988843">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="19" />
+          <entry key="project.closed" value="20" />
           <entry key="project.open.time.0" value="2" />
           <entry key="project.open.time.1" value="6" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.4" value="3" />
-          <entry key="project.open.time.5" value="4" />
+          <entry key="project.open.time.5" value="5" />
           <entry key="project.open.time.6" value="3" />
-          <entry key="project.opened" value="19" />
+          <entry key="project.opened" value="20" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -106,7 +98,7 @@
             <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="615">
-                  <caret line="41" column="63" selection-start-line="41" selection-start-column="63" selection-end-line="41" selection-end-column="63" />
+                  <caret line="41" column="40" selection-start-line="41" selection-start-column="40" selection-end-line="41" selection-end-column="40" />
                 </state>
               </provider>
             </entry>
@@ -161,7 +153,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/lib/ShellEnergy.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="855">
+                <state relative-caret-position="870">
                   <caret line="58" selection-start-line="58" selection-end-line="58" />
                 </state>
               </provider>
@@ -251,17 +243,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope">
-        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
-          <expand>
-            <path>
-              <item name="ShearDeformation" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -272,6 +253,17 @@
             <path>
               <item name="ShearDeformation" type="b2602c69:ProjectViewProjectNode" />
               <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
+          <expand>
+            <path>
+              <item name="ShearDeformation" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
             </path>
           </expand>
           <select />
@@ -342,11 +334,12 @@
       <workItem from="1541217239225" duration="1079000" />
       <workItem from="1541220680270" duration="530000" />
       <workItem from="1542347400528" duration="76000" />
+      <workItem from="1543134752219" duration="56000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51542000" />
+    <option name="totallyTimeSpent" value="51598000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -360,9 +353,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="3840" height="1600" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4973822" visible="true" weight="0.07977883" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4973822" visible="true" weight="0.080042124" />
       <window_info id="Structure" order="1" sideWeight="0.5026178" side_tool="true" weight="0.17765568" />
       <window_info id="Favorites" order="2" sideWeight="0.5026178" side_tool="true" weight="0.17765568" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -540,6 +532,7 @@
     <entry file="file://$PROJECT_DIR$/lib/ShellEnergyWithSwellRatio.cpp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/lib/cmake-build-debug/CMakeCache.txt" />
     <entry file="file://$PROJECT_DIR$/lib/ComputeCoefficient.cpp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -559,9 +552,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/cmake-build-debug/CMakeCache.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/ShellEnergyWithSwellRatio.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="705">
@@ -571,22 +561,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/ShellEnergy.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
+        <state relative-caret-position="870">
           <caret line="58" selection-start-line="58" selection-end-line="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="615">
-          <caret line="41" column="63" selection-start-line="41" selection-start-column="63" selection-end-line="41" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/ShellEnergy.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="23" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="23" />
         </state>
       </provider>
     </entry>
@@ -594,6 +570,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
           <caret line="36" column="24" selection-start-line="36" selection-start-column="24" selection-end-line="36" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="29" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/ShellEnergy.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="23" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="23" />
         </state>
       </provider>
     </entry>

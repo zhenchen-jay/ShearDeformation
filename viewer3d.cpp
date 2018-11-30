@@ -5,6 +5,7 @@
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
 #include <imgui/imgui.h>
 #include "lib/ComputeCoefficient.h"
+#include "lib/FindFirstFundamentalCoef.h"
 
 #ifndef IT_NUM
 #define IT_NUM 10
@@ -75,8 +76,8 @@ void compute_cylinder()
 
 int main(int argc, char *argv[])
 {
-    auto op_1 = std::make_unique<ComputeCoefficient>();
-    op_1->test();
+    auto op_1 = std::make_unique<FindFirstFundamentalCoef>();
+    op_1->test_func_grad();
 //    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
 //    //std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
 //    std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect";
