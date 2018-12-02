@@ -116,7 +116,6 @@ void ShellEnergyStandard::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, 
 
         GeoFeature::calculate_second_fundamental_form(V.row(F(i,0)), V.row(F(i,1)), V.row(F(i,2)), adjacent_points[0], adjacent_points[1], adjacent_points[2], real_pts, II_D);
         GeoFeature::calculate_second_fundamental_form(V0.row(F(i,0)), V0.row(F(i,1)), V0.row(F(i,2)), adjacent_points_U[0], adjacent_points_U[1], adjacent_points_U[2], real_pts, II_U);
-
         IIU_list.push_back(II_U);
         IID_list.push_back(II_D);
 

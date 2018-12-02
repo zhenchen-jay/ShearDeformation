@@ -8,8 +8,9 @@
 class FindFirstFundamentalCoef
 {
 public:
-    FindFirstFundamentalCoef(): _is_initialized(false),ID_list(0,Eigen::Matrix2d()),
-    IID_list(0,Eigen::Matrix2d()), dID_index(0,std::vector<int>(0,0)),dIID_index(0,std::vector<int>(0,0)){}
+//    FindFirstFundamentalCoef(): _is_initialized(false),ID_list(0,Eigen::Matrix2d()),
+//    IID_list(0,Eigen::Matrix2d()), dID_index(0,std::vector<int>(0,0)),dIID_index(0,std::vector<int>(0,0)){}
+    FindFirstFundamentalCoef(): _is_initialized(false){}
     ~FindFirstFundamentalCoef(){}
 
 public:
@@ -29,12 +30,10 @@ private:
     
     std::vector<Eigen::Matrix2d> ID_list;
     std::vector<Eigen::Matrix2d> IID_list;
-    
-    Eigen::SparseMatrix<double> dID_list;
-    Eigen::SparseMatrix<double> dIID_list;
-    
-    std::vector<std::vector<int> > dID_index;
-    std::vector<std::vector<int> > dIID_index;
+//
+    std::vector<std::vector<Eigen::Matrix2d > > dID_list; // The list to store the derivative of the first fundamental form. The order is determined by VF
+    std::vector<std::vector<Eigen::Matrix2d > > dIID_list_neighbor;// The list to store the derivative of the first fundamental form. The order is determined by VF
+    std::vector<std::vector<Eigen::Matrix2d > > dIID_list_2_neighbor; // The list to store the derivative of the first fundamental form. The order is determined by TT
     
     double _PoissonsRatio;
     double _YoungsModulus;
