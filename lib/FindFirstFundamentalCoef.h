@@ -16,8 +16,12 @@ public:
 public:
     void get_func_grad(Eigen::VectorXd &x, double &f, Eigen::VectorXd &df);
     void set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, double YonungsModulus, double PoissonRatio, double thickness);
-    
+
     void test_func_grad();
+
+private:
+    void compute_derative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d > &dA);
+
 
 private:
     bool _is_initialized;
