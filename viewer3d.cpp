@@ -79,18 +79,7 @@ int main(int argc, char *argv[])
 {
     auto op_1 = std::make_unique<FindFirstFundamentalCoef>();
     op_1->test_func_grad();
-    Eigen::MatrixXd V(4,3);
-    Eigen::MatrixXi F(2,3);
     
-    V << 0, 0, 0,
-    1, 0, 0,
-    1, 1, 0,
-    2, 1, 0;
-    
-    F<<0, 1, 2,
-    1, 3, 2;
-
-    igl::writeOBJ("/Users/chenzhen/UT/Research/Results/test_squares.obj", V, F);
 //    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
 //    //std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
 //    std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect";

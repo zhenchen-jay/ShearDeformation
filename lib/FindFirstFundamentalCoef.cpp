@@ -381,8 +381,8 @@ void FindFirstFundamentalCoef::test_func_grad()
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
     
-    igl::readOBJ("../../benchmarks/TestModels/rect.obj", V0, F0);
-    igl::readOBJ("../../benchmarks/TestModels/saddle.obj", V, F);
+    igl::readOBJ("../benchmarks/TestModels/rect.obj", V0, F0);
+    igl::readOBJ("../benchmarks/TestModels/saddle.obj", V, F);
     
 //    igl::readOBJ("../../benchmarks/TestModels/test_squre.obj", V0,F0);
 //    igl::readOBJ("../../benchmarks/TestModels/test_squre_bended.obj", V,F);
@@ -419,7 +419,7 @@ void FindFirstFundamentalCoef::test_func_grad()
         std::cout<<"Selected index is: "<<selected_i<<" Eplison is: "<<eps(selected_i)<<std::endl;
         std::cout<<"finite difference is: "<<(E1-E)/pow(10,-k)<<std::endl;
         std::cout<<"gradient projection: "<<dE.dot(eps)/eps(selected_i)<<std::endl;
-        std::cout<<"The different between the finite difference and gradient is: "<<abs((E1-E)/eps(selected_i) - dE.dot(eps)/eps(selected_i))<<std::endl;
+        std::cout<<"The different between the finite difference and gradient is: "<<std::abs((E1-E)/pow(10,-k) - dE.dot(eps)/eps(selected_i))<<std::endl;
         x1=x;
     }
     
