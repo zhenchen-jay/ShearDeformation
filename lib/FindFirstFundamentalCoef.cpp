@@ -272,11 +272,8 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
             std::vector<Eigen::Matrix2d> dIU_inv(3),A(3),dI(3);
             std::vector<double> diff_sqrt_det(3);
             
-            diff_sqrt_det[0] = 0.5*IU_list[f](1,1)/sqrt(IU_list[f].determinant());
-            diff_sqrt_det[1] = -1.0*IU_list[f](0,1)/sqrt(IU_list[f].determinant());
-            diff_sqrt_det[2] = 0.5*IU_list[f](0,0)/sqrt(IU_list[f].determinant());
-            
-            compute_derative_inv_mat(IU_list[f], dIU_inv);
+            compute_derivative_sqrt_det(IU_list[f], diff_sqrt_det);
+            compute_derivative_inv_mat(IU_list[f], dIU_inv);
             
             for(int r=0;r<3;r++)
             {
@@ -305,11 +302,8 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
             std::vector<Eigen::Matrix2d> dIU_inv(3),A(3),dII(3);
             std::vector<double> diff_sqrt_det(3);
             
-            diff_sqrt_det[0] = 0.5*IU_list[f](1,1)/sqrt(IU_list[f].determinant());
-            diff_sqrt_det[1] = -1.0*IU_list[f](0,1)/sqrt(IU_list[f].determinant());
-            diff_sqrt_det[2] = 0.5*IU_list[f](0,0)/sqrt(IU_list[f].determinant());
-            
-            compute_derative_inv_mat(IU_list[f], dIU_inv);
+            compute_derivative_sqrt_det(IU_list[f], diff_sqrt_det);
+            compute_derivative_inv_mat(IU_list[f], dIU_inv);
             
             for(int r=0;r<3;r++)
             {
@@ -328,10 +322,8 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
             if(TT(f,(fi+1)%3)!=-1)
             {
                 int fa = TT(f,(fi+1)%3);
-                diff_sqrt_det[0] = 0.5*IU_list[fa](1,1)/sqrt(IU_list[fa].determinant());
-                diff_sqrt_det[1] = -1.0*IU_list[fa](0,1)/sqrt(IU_list[fa].determinant());
-                diff_sqrt_det[2] = 0.5*IU_list[fa](0,0)/sqrt(IU_list[fa].determinant());
-                compute_derative_inv_mat(IU_list[fa], dIU_inv);
+                compute_derivative_sqrt_det(IU_list[fa], diff_sqrt_det);
+                compute_derivative_inv_mat(IU_list[fa], dIU_inv);
                 for(int r=0;r<3;r++)
                 {
                     for(int c=0;c<3;c++)
@@ -354,7 +346,7 @@ void FindFirstFundamentalCoef::get_func_grad(Eigen::VectorXd &x, double &f, Eige
     std::cout<<"Finished!"<<std::endl;
 }
 
-void FindFirstFundamentalCoef::compute_derative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d> &dA)
+void FindFirstFundamentalCoef::compute_derivative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d> &dA)
 {
     dA.resize(3);
     std::vector<Eigen::Matrix2d> C(3);
@@ -369,24 +361,15 @@ void FindFirstFundamentalCoef::compute_derative_inv_mat(Eigen::Matrix2d A, std::
     dA[1]=2.0*A(0,1)/A.determinant()*A.inverse() + 1.0/A.determinant()*C[1];
     dA[2]=-1.0*A(0,0)/A.determinant()*A.inverse() + 1.0/A.determinant()*C[2];
     
-    //    std::cout<<dA[0]<<std::endl;
-    //    std::cout<<std::endl<<dA[1]<<std::endl;
-    //    std::cout<<std::endl<<dA[2]<<std::endl;
-    //
-    //    double x = A(0,0), y = A(1,0), z=A(1,1);
-    //    Eigen::Matrix2d B;
-    //    B << z,-y,
-    //    -y,x;
-    //    std::vector<Eigen::Matrix2d> dA1(3);
-    //    dA1[0] = -z/pow(x*z-y*y,2.0)*B + 1.0/(x*z-y*y)*C[0];
-    //    dA1[2] = -x/pow(x*z-y*y,2.0)*B + 1.0/(x*z-y*y)*C[2];
-    //    dA1[1] = 2*y/pow(x*z-y*y,2.0)*B + 1.0/(x*z-y*y)*C[1];
-    //
-    //    std::cout<<std::endl<<dA1[0]<<std::endl;
-    //    std::cout<<std::endl<<dA1[1]<<std::endl;
-    //    std::cout<<std::endl<<dA1[2]<<std::endl;
     
-    
+}
+
+void FindFirstFundamentalCoef::compute_derivative_sqrt_det(Eigen::Matrix2d A, std::vector<double> &diff_sqrt_det)
+{
+    diff_sqrt_det.resize(3);
+    diff_sqrt_det[0] = 0.5*A(1,1)/sqrt(A.determinant());
+    diff_sqrt_det[1] = -1.0*A(0,1)/sqrt(A.determinant());
+    diff_sqrt_det[2] = 0.5*A(0,0)/sqrt(A.determinant());
 }
 
 void FindFirstFundamentalCoef::test_func_grad()
@@ -398,11 +381,11 @@ void FindFirstFundamentalCoef::test_func_grad()
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
     
-    igl::readOBJ("../../benchmarks/DrapedRect/3876_triangles/draped_rect_geometry.obj", V0, F0);
-    igl::readOBJ("../../benchmarks/cylinder.obj", V, F);
+    igl::readOBJ("../../benchmarks/TestModels/rect.obj", V0, F0);
+    igl::readOBJ("../../benchmarks/TestModels/saddle.obj", V, F);
     
-//    igl::readOBJ("/Users/chenzhen/UT/Research/Results/test/test_squre.obj", V0,F0);
-//    igl::readOBJ("/Users/chenzhen/UT/Research/Results/test/test_squre_bended.obj", V,F);
+//    igl::readOBJ("../../benchmarks/TestModels/test_squre.obj", V0,F0);
+//    igl::readOBJ("../../benchmarks/TestModels/test_squre_bended.obj", V,F);
     double E, E1,E2,E3;
     Eigen::VectorXd dE, dE1,dE2,dE3;
     Eigen::VectorXd x(F.rows()*3);

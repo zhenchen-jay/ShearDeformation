@@ -20,7 +20,8 @@ public:
     void test_func_grad();
 
 private:
-    void compute_derative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d > &dA);
+    void compute_derivative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d > &dA);
+    void compute_derivative_sqrt_det(Eigen::Matrix2d A, std::vector<double> &diff_sqrt_det);
 
 
 private:
