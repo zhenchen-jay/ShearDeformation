@@ -8,7 +8,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-#########################################################################
+set(CMAKE_PREFIX_PATH "$ENV{HOME}/.local")
+
+#######################i#################################################
 # Use C++14
 set (CMAKE_CXX_STANDARD 14)
 
@@ -38,9 +40,12 @@ option(LIBIGL_WITH_XML               "Use XML"            OFF)
 find_package(LIBIGL REQUIRED)
 message("Found LibIGL at ${LIBIGL_INCLUDE_DIR} from $ENV(LIBIGL}")
 
+find_package(ifopt REQUIRED)
+message("Found IFOPT at ${ifopt_INCLUDE_DIRS} from $ENV(ifopt}")
 
 # Add include files for libigl and Eigen
 include_directories( ${LIBIGL_INCLUDE_DIR} )
+include_directories( ${ifopt_INCLUDE_DIRS} )
 
 # Self-defined libs
 add_subdirectory(lib)
@@ -50,6 +55,6 @@ add_subdirectory(external/LSQR)
 # Add your project files
 file(GLOB SRCFILES *.cpp)
 add_executable(${PROJECT_NAME}_bin ${SRCFILES} viewer3d.cpp)
-target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw igl::opengl_glfw_imgui lib alglib lsqr)
+target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw igl::opengl_glfw_imgui lib alglib lsqr ifopt::ifopt_ipopt)
 
 ################################################################################

@@ -381,8 +381,8 @@ void FindFirstFundamentalCoef::test_func_grad()
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
     
-    igl::readOBJ("../benchmarks/TestModels/rect.obj", V0, F0);
-    igl::readOBJ("../benchmarks/TestModels/saddle.obj", V, F);
+    igl::readOBJ("../../benchmarks/TestModels/rect.obj", V0, F0);
+    igl::readOBJ("../../benchmarks/TestModels/saddle.obj", V, F);
     
 //    igl::readOBJ("../../benchmarks/TestModels/test_squre.obj", V0,F0);
 //    igl::readOBJ("../../benchmarks/TestModels/test_squre_bended.obj", V,F);
@@ -412,7 +412,6 @@ void FindFirstFundamentalCoef::test_func_grad()
     eps.setZero();
     for(int k=6;k<16;k++)
     {
-        selected_i = 0;
         eps(selected_i) = pow(10,-k);
         x1 += eps;
         get_func_grad(x1, E1, dE1);
