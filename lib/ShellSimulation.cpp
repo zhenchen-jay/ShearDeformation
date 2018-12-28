@@ -9,7 +9,9 @@
 #include "ExternalEnergy.h"
 #include "ShellEnergyStandard.h"
 #include "ShellEnergyWithSwellRatio.h"
+#include "ShellEnergyMatrixI.h"
 #include "ComputeCoefficient.h"
+#include "FindFirstFundamentalCoef.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -89,33 +91,21 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix, const std::st
         return false;
     ratio = 0;
     
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F1;
-    igl::readOBJ(tar_shape + "/cylinder.obj", V, F1);
-    auto op = std::make_unique<ComputeCoefficient>();
-//    std::string filename = "/Users/chenzhen/UT/Research/Results/omega_list_cylinder.dat";
-//    std::ifstream ifs_1(filename);
-//    _omega_list.resize(F.rows());
-//    for(int i=0;i<F.rows();i++)
+//    Eigen::MatrixXd V;
+//    Eigen::MatrixXi F1;
+//    igl::readOBJ(tar_shape + "/saddle.obj", V, F1);
+//    auto op = std::make_unique<FindFirstFundamentalCoef>();
+//    op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
+//    Eigen::VectorXd sol;
+//    op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
+//    std::ofstream outfile(tar_shape+"/L_list_saddle.dat",std::ios::trunc);
+//    outfile<<sol.size()<<"\n";
+//    for(int i=0;i<sol.size()-1;i++)
 //    {
-//        double value;
-//        ifs_1 >> value;
-//        std::cout<<value<<std::endl;
-//        _omega_list(i) = value;
+//        outfile<<std::setprecision(16)<<sol(i)<<"\n";
 //    }
-    _omega_list = op->find_optimal_sol(VU, V, F, _YoungsModulus, _PoissonsRatio, _thickness, 1e-5, 1000);
-    for(int i=0;i<_omega_list.size();i++)
-    {
-        _omega_list(i) = 1.0/_omega_list(i);
-    }
-    std::cout<<_omega_list<<std::endl;
-    std::ofstream outfile(tar_shape + "/omega_list_test.dat",std::ios::trunc);
-    for(int i=0;i<_omega_list.size()-1;i++)
-    {
-            outfile<<std::setprecision(16)<<_omega_list[i]<<"\n";
-    }
-    outfile<<std::setprecision(16)<<_omega_list[_omega_list.size()-1];
-    outfile.close();
+//    outfile<<std::setprecision(16)<<sol(sol.size()-1);
+//    outfile.close();
     _is_initialized = true;
     
     return true;
@@ -209,11 +199,12 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
         V.row(i)<<x[3*i],x[3*i+1],x[3*i+2];
     }
     std::unique_ptr<ShellEnergy> op_shell;
-    op_shell = std::make_unique<ShellEnergyWithSwellRatio>();
+   // op_shell = std::make_unique<ShellEnergyWithSwellRatio>();
+    op_shell = std::make_unique<ShellEnergyMatrixI>();
     op_shell->_ratio=ratio;
-    op_shell->_omega_list = _omega_list;
-    auto op_external = std::make_unique<ExternalEnergy>();
-    double E_streching(0), E_external(0), E_bending(0);
+    op_shell->load_L_list("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/L_list_hypar.dat");
+//    auto op_external = std::make_unique<ExternalEnergy>();
+    double E_streching(0), E_bending(0);
     Eigen::VectorXd diff_f_streching,diff_f_external,diff_f_bending;
     op_shell->streching_energy(V,VU,F,_YoungsModulus,_PoissonsRatio,_thickness,E_streching,diff_f_streching);
     op_shell->bending_energy(V, VU, F, _YoungsModulus, _PoissonsRatio, _thickness, E_bending, diff_f_bending);

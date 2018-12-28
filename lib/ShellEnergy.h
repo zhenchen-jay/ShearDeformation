@@ -50,9 +50,15 @@ public:
 
     virtual void test_bending_energy()=0;
     
+    void load_L_list(std::string file_path);
+    
 public:
     double _ratio;
     Eigen::VectorXd _omega_list;
+
+    
+protected:
+    std::vector<double> L_list;
 };
 
 #endif //SHEARDEFORMATION_SHELLENERGY_H

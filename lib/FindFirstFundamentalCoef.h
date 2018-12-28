@@ -16,7 +16,7 @@ public:
 public:
     void get_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df);
     void set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, double YonungsModulus, double PoissonRatio, double thickness);
-    void compute_first_fundamental_form(Eigen::MatrixXd VD, Eigen::MatrixXi F0, std::vector<Eigen::Matrix2d> &IU_array, double YoungsModulus, double PoissonRatio, double thickness);
+    void compute_first_fundamental_form(Eigen::MatrixXd VD, Eigen::MatrixXi F0, Eigen::VectorXd &sol, double YoungsModulus, double PoissonRatio, double thickness);
 
     void test_func_grad();
 

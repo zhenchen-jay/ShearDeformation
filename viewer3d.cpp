@@ -15,7 +15,7 @@
 // #include "lib/IfoptSolver.h"
 
 #ifndef IT_NUM
-#define IT_NUM 10
+#define IT_NUM 1
 #endif
 
 auto op = std::make_unique<ShellSimulation>();
@@ -83,17 +83,6 @@ void compute_cylinder()
 
 int main(int argc, char *argv[])
 {
-    auto op_1 = std::make_unique<FindFirstFundamentalCoef>();
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F;
-    
-    igl::readOBJ("../benchmarks/TestModels/sphere.obj", V, F);
-    std::vector<Eigen::Matrix2d> IU_array;
-    double YoungsModulus = 1e5;
-    double PossionRatio = 0.3;
-    double thickness = 1e-4;
-    
-    op_1->compute_first_fundamental_form(V, F, IU_array, YoungsModulus, PossionRatio, thickness);
 //    using namespace ifopt;
 //    double YoungsModulus = 1e5;
 //    double PossionRatio = 0.3;
@@ -130,28 +119,26 @@ int main(int argc, char *argv[])
 //    std::cout<<f<<std::endl;
 //    std::cout<<df<<std::endl;
 
-}
     
     
 //    auto op_1 = std::make_unique<FindFirstFundamentalCoef>();
 //    op_1->test_func_grad();
     
-//    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
-//    //std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
-//    std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect";
-//    std::string tar_prob = "/Users/chenzhen/UT/Research/Results/cylinder";
-//    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/ClampedCylindricalShell/2496_triangles/cantilever_cylindrical_shell";
-//    bool ok = op->set_up_simulation(problem, tar_prob);
-//    if (!ok)
-//    {
-//        std::cerr << "Couldn't load problem: " << problem << std::endl;
-//        return -1;
-//    }
-//  //op->compute_deformed_surface(V, F);
-//
-//    reset();
-//    igl::readOBJ(tar_prob + "/cylinder.obj", V, F);
-//    // op->add_noise();
+    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
+    //std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
+    std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect";
+    std::string tar_prob = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels";
+    bool ok = op->set_up_simulation(problem, tar_prob);
+    if (!ok)
+    {
+        std::cerr << "Couldn't load problem: " << problem << std::endl;
+        return -1;
+    }
+  //op->compute_deformed_surface(V, F);
+
+    reset();
+    igl::readOBJ(tar_prob + "/hypar.obj", V, F);
+    // op->add_noise();
 //    for(int i=0;i<IT_NUM;i++)
 //    {
 //        double ratio = (i+1)*1.0/IT_NUM;
@@ -163,47 +150,47 @@ int main(int argc, char *argv[])
 //    igl::writeOBJ(tar_prob + "/Result.obj", V, F);
     
     
-//    //op->compute_deformed_surface(V, F);
-//    igl::opengl::glfw::Viewer viewer;
-//
-//    // Attach a menu plugin
-//    igl::opengl::glfw::imgui::ImGuiMenu menu;
-//    viewer.plugins.push_back(&menu);
-//
-//    // Add content to the default menu window
-//    menu.draw_viewer_menu_func = [&]()
-//    {
-//        // Draw parent menu content
-//        menu.draw_viewer_menu();
-//
-//        // Add new group
-//        if (ImGui::CollapsingHeader("Optimization", ImGuiTreeNodeFlags_DefaultOpen))
-//        {
-//            if (ImGui::Button("Reset", ImVec2(-1, 0)))
-//            {
-//                reset();
-//                repaint(viewer);
-//            }
-//            if (ImGui::Button("Optimize Some Step", ImVec2(-1,0)))
-//            {
-//                //igl::readOBJ("/Users/chenzhen/UT/Research/Results/cylinder.obj", V, F);
-//                //op->add_noise();
-//                for(int i=0;i<IT_NUM;i++)
-//                {
-//                    double ratio = (i+1)*1.0/IT_NUM;
-//                    op->ratio = ratio;
-//                    std::cout<<ratio<<std::endl;
-//                    op->compute_deformed_surface(V,F);
-//                }
-//                repaint(viewer);
-//                std::cout<<"Finished"<<std::endl;
-//            }
-//        }
-//    };
-//
-//
-//    viewer.data().set_face_based(false);
-//    repaint(viewer);
-//    viewer.launch();
-// }
+    //op->compute_deformed_surface(V, F);
+    igl::opengl::glfw::Viewer viewer;
+
+    // Attach a menu plugin
+    igl::opengl::glfw::imgui::ImGuiMenu menu;
+    viewer.plugins.push_back(&menu);
+
+    // Add content to the default menu window
+    menu.draw_viewer_menu_func = [&]()
+    {
+        // Draw parent menu content
+        menu.draw_viewer_menu();
+
+        // Add new group
+        if (ImGui::CollapsingHeader("Optimization", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if (ImGui::Button("Reset", ImVec2(-1, 0)))
+            {
+                reset();
+                repaint(viewer);
+            }
+            if (ImGui::Button("Optimize Some Step", ImVec2(-1,0)))
+            {
+                //igl::readOBJ("/Users/chenzhen/UT/Research/Results/cylinder.obj", V, F);
+                op->add_noise();
+                for(int i=0;i<IT_NUM;i++)
+                {
+                    double ratio = (i+1)*1.0/IT_NUM;
+                    op->ratio = ratio;
+                    std::cout<<ratio<<std::endl;
+                    op->compute_deformed_surface(V,F);
+                }
+                repaint(viewer);
+                std::cout<<"Finished"<<std::endl;
+            }
+        }
+    };
+
+
+    viewer.data().set_face_based(false);
+    repaint(viewer);
+    viewer.launch();
+ }
 

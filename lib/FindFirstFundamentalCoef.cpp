@@ -13,13 +13,13 @@
 
 // TO DO: Calculate the second derivative and use newton method to solve this problem
 
-void callback_func(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
+void callback_func_coef(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
 {
     FindFirstFundamentalCoef* callback = (FindFirstFundamentalCoef*) ptr;
     callback->get_func_grad(x,f,df);
 }
 
-void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD, Eigen::MatrixXi F0, std::vector<Eigen::Matrix2d> &IU_array, double YoungsModulus, double PoissonRatio, double thickness)
+void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD, Eigen::MatrixXi F0, Eigen::VectorXd &sol, double YoungsModulus, double PoissonRatio, double thickness)
 {
     _itr_times = 0;
     if(!_is_initialized)
@@ -41,7 +41,7 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     Eigen::MatrixXd V_int;
     Eigen::MatrixXi F_int;
     
-    igl::readOBJ("../benchmarks/TestModels/rect.obj", V_int, F_int);
+    igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/rect.obj", V_int, F_int);
     for(int i=0;i<F.rows();i++)
     {
         Eigen::Matrix2d I0;
@@ -61,17 +61,16 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     alglib::minlbfgscreate(x.length(),x, state);
     alglib::minlbfgssetcond(state, epsg, epsf, epsx, maxits);
     alglib::minlbfgssetstpmax(state, stpmax);
-    alglib::minlbfgsoptimize(state, callback_func, NULL, this);
+    alglib::minlbfgsoptimize(state, callback_func_coef, NULL, this);
     alglib::minlbfgsresults(state, x, rep);
 
     printf("%d\n", int(rep.terminationtype));
-    std::ofstream outfile("L_list.dat",std::ios::trunc);
-    for(int i=0;i<x.length()-1;i++)
+
+    sol.resize(x.length());
+    for(int i=0;i<x.length();i++)
     {
-        outfile<<std::setprecision(16)<<x[i]<<"\n";
+        sol(i) = x[i];
     }
-    outfile<<std::setprecision(16)<<x[x.length()-1];
-    outfile.close();
 }
 
 void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, double YoungsModulus, double PoissonRatio, double thickness)
@@ -216,7 +215,7 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
     _itr_times++;
     if(_itr_times%100 == 0)
     {
-        std::ofstream outfile("L_list.dat",std::ios::trunc);
+        std::ofstream outfile("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/L_list_saddle.dat",std::ios::trunc);
         for(int i=0;i<x.length()-1;i++)
         {
             outfile<<std::setprecision(16)<<x[i]<<"\n";

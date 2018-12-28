@@ -1,9 +1,7 @@
 //
 // Created by Zhen Chen on 12/27/18.
 //
-
-#ifndef SHEARDEFORMATION_SHELLENERGYSTANDARD_H
-#define SHEARDEFORMATION_SHELLENERGYSTANDARD_HStandard
+#pragma once
 
 #include "ShellEnergy.h"
 
@@ -46,10 +44,10 @@ public:
      */
 
     virtual void test_bending_energy() override;
+
+
     
 
 };
 
 
-
-#endif //SHEARDEFORMATION_SHELLENERGYSTANDARD_H
