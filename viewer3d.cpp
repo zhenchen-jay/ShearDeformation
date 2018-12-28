@@ -1,12 +1,18 @@
+#include <memory>
 #include <igl/opengl/glfw/Viewer.h>
-#include "lib/ShellEnergy.h"
-#include "lib/ShellSimulation.h"
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
 #include <imgui/imgui.h>
+// #include <ifopt/problem.h>
+// #include <ifopt/ipopt_solver.h>
+// #include <ifopt/test_vars_constr_cost.h>
+
 #include "lib/ComputeCoefficient.h"
 #include "lib/FindFirstFundamentalCoef.h"
-#include <memory>
+#include "lib/ShellEnergy.h"
+#include "lib/ShellSimulation.h"
+
+// #include "lib/IfoptSolver.h"
 
 #ifndef IT_NUM
 #define IT_NUM 10
@@ -78,7 +84,57 @@ void compute_cylinder()
 int main(int argc, char *argv[])
 {
     auto op_1 = std::make_unique<FindFirstFundamentalCoef>();
-    op_1->test_func_grad();
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
+    
+    igl::readOBJ("../benchmarks/TestModels/sphere.obj", V, F);
+    std::vector<Eigen::Matrix2d> IU_array;
+    double YoungsModulus = 1e5;
+    double PossionRatio = 0.3;
+    double thickness = 1e-4;
+    
+    op_1->compute_first_fundamental_form(V, F, IU_array, YoungsModulus, PossionRatio, thickness);
+//    using namespace ifopt;
+//    double YoungsModulus = 1e5;
+//    double PossionRatio = 0.3;
+//    double thickness = 1e-3;
+//
+//    Eigen::MatrixXd V;
+//    Eigen::MatrixXi F;
+//    igl::readOBJ("../../benchmarks/TestModels/sphere.obj", V, F);
+//    Problem nlp;
+//    auto variable_set = std::make_shared<optVariables>(3*F.rows(), "var_set");
+//    auto constraint_set = std::make_shared<optConstraint>(F.rows(), "constraint");
+//    auto cost_term = std::make_shared<optCost>(V,F,YoungsModulus,PossionRatio,thickness);
+//    nlp.AddVariableSet(variable_set);
+//    nlp.AddConstraintSet(constraint_set);
+//    nlp.AddCostSet(cost_term);
+//    nlp.PrintCurrent();
+//
+//    IpoptSolver ipopt;
+//    ipopt.SetOption("linear_solver", "mumps");
+//    ipopt.SetOption("jacobian_approximation", "exact");
+//    ipopt.SetOption("max_cpu_time", 1e6);
+//    ipopt.SetOption("tol", 1e-10);
+//    ipopt.SetOption("print_level", 5);
+//
+//    // 3 . solve
+//    ipopt.Solve(nlp);
+//    Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
+//    //std::cout << x.transpose() << std::endl;
+//    auto op = std::make_unique<FindFirstFundamentalCoef>();
+//    op->set_up(V, F, YoungsModulus, PossionRatio, thickness);
+//    double f;
+//    Eigen::VectorXd df;
+//    op->get_func_grad(x, f, df);
+//    std::cout<<f<<std::endl;
+//    std::cout<<df<<std::endl;
+
+}
+    
+    
+//    auto op_1 = std::make_unique<FindFirstFundamentalCoef>();
+//    op_1->test_func_grad();
     
 //    //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
 //    //std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
@@ -149,5 +205,5 @@ int main(int argc, char *argv[])
 //    viewer.data().set_face_based(false);
 //    repaint(viewer);
 //    viewer.launch();
-}
+// }
 

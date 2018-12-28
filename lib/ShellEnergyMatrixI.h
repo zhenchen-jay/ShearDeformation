@@ -1,13 +1,13 @@
 //
-// Created by Zhen Chen on 10/19/18.
+// Created by Zhen Chen on 12/27/18.
 //
 
 #ifndef SHEARDEFORMATION_SHELLENERGYSTANDARD_H
-#define SHEARDEFORMATION_SHELLENERGYSTANDARD_H
+#define SHEARDEFORMATION_SHELLENERGYSTANDARD_HStandard
 
 #include "ShellEnergy.h"
 
-class ShellEnergyStandard : public ShellEnergy {
+class ShellEnergyMatrixI : public ShellEnergy {
 
 public:
 

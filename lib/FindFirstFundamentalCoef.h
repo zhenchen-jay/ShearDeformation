@@ -14,18 +14,20 @@ public:
     ~FindFirstFundamentalCoef(){}
 
 public:
-    void get_func_grad(Eigen::VectorXd &x, double &f, Eigen::VectorXd &df);
+    void get_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df);
     void set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, double YonungsModulus, double PoissonRatio, double thickness);
+    void compute_first_fundamental_form(Eigen::MatrixXd VD, Eigen::MatrixXi F0, std::vector<Eigen::Matrix2d> &IU_array, double YoungsModulus, double PoissonRatio, double thickness);
 
     void test_func_grad();
 
 private:
-    void compute_derivative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d > &dA);
-    void compute_derivative_sqrt_det(Eigen::Matrix2d A, std::vector<double> &diff_sqrt_det);
+    void compute_derivative_inv_mat(Eigen::Matrix2d A, std::vector<Eigen::Matrix2d > &dA); // Compute the derivative of A*A^T
+    void compute_derivative_sqrt_det(Eigen::Matrix2d A, std::vector<double> &diff_sqrt_det); // Compute the derivative of A*A^T
 
 
 private:
     bool _is_initialized;
+    int _itr_times;
     std::vector<std::vector<int> > VF;  // list of lists of incident faces (adjacency list)
     std::vector<std::vector<int> > VFi; // list of lists of index of incidence within incident faces listed in VF
     Eigen::MatrixXi TT;             // The matrix which stores the information of adjacent faces
