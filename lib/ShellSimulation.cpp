@@ -94,12 +94,12 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix, const std::st
     
     Eigen::MatrixXd V;
     Eigen::MatrixXi F1;
-    igl::readOBJ(tar_shape + "/saddle.obj", V, F1);
+    igl::readOBJ(tar_shape + "/cylinder.obj", V, F1);
     auto op = std::make_unique<FindFirstFundamentalCoef>();
     op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
     Eigen::VectorXd sol;
     op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
-    std::ofstream outfile(tar_shape+"/L_list_saddle_1.dat",std::ios::trunc);
+    std::ofstream outfile(tar_shape+"/L_list_cylinder.dat",std::ios::trunc);
     outfile<<sol.size()<<"\n";
     for(int i=0;i<sol.size()-1;i++)
     {
@@ -203,7 +203,7 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
    // op_shell = std::make_unique<ShellEnergyWithSwellRatio>();
     op_shell = std::make_unique<ShellEnergyMatrixI>();
     op_shell->_ratio=ratio;
-    op_shell->load_L_list("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/L_list_cylinder.dat");
+    op_shell->load_L_list("../../benchmarks/TestModels/L_list_cylinder.dat");
 //    auto op_external = std::make_unique<ExternalEnergy>();
     double E_streching(0), E_bending(0);
     Eigen::VectorXd diff_f_streching,diff_f_external,diff_f_bending;

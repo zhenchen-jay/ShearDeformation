@@ -126,8 +126,8 @@ int main(int argc, char *argv[])
     
     //std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/CantileverPlate/1040_triangles/cantilever_plate";
     //std:: string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/SlitAnnulus/2907_trianges/slit_annular_plate";
-    std::string problem = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/DrapedRect/3876_triangles/draped_rect";
-    std::string tar_prob = "/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels";
+    std::string problem = "../../benchmarks/DrapedRect/3876_triangles/draped_rect";
+    std::string tar_prob = "../../benchmarks/TestModels";
     bool ok = op->set_up_simulation(problem, tar_prob);
     if (!ok)
     {

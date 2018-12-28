@@ -224,7 +224,7 @@ void ShellEnergyMatrixI::test_bending_energy()
 {
     double YoungsModulus = 1e5;
     double PossionRatio = 0.3;
-    double thickness = 1;
+    double thickness = 1e-2;
     
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;

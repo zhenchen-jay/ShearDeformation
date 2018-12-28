@@ -43,27 +43,27 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     Eigen::MatrixXd V_int;
     Eigen::MatrixXi F_int;
     
-    igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/rect.obj", V_int, F_int);
-    std::ifstream infile("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/L_list_cylinder_1.dat");
-    if(!infile)
-        return;
-    int num;
-    infile >> num;
-    double d;
-    for(int i=0;i<num;i++)
-    {
-        infile >> d;
-        x[i] = d;
-    }
-//    for(int i=0;i<F.rows();i++)
+    igl::readOBJ("../../benchmarks/TestModels/rect.obj", V_int, F_int);
+//    std::ifstream infile("../../benchmarks/TestModels/L_list_cylinder_1.dat");
+//    if(!infile)
+//        return;
+//    int num;
+//    infile >> num;
+//    double d;
+//    for(int i=0;i<num;i++)
 //    {
-//        Eigen::Matrix2d I0;
-//        V_int = V;
-//        GeoFeature::calculate_first_fundamental_form(V_int.row(F_int(i,0)),V_int.row(F_int(i,1)),V_int.row(F_int(i,2)),I0);
-//        x[3*i] = sqrt(I0(0,0));
-//        x[3*i+1] = I0(0,1)/x[3*i];
-//        x[3*i+2] = sqrt(I0.determinant())/x[3*i];
+//        infile >> d;
+//        x[i] = d;
 //    }
+    for(int i=0;i<F.rows();i++)
+    {
+        Eigen::Matrix2d I0;
+        V_int = V;
+        GeoFeature::calculate_first_fundamental_form(V_int.row(F_int(i,0)),V_int.row(F_int(i,1)),V_int.row(F_int(i,2)),I0);
+        x[3*i] = sqrt(I0(0,0));
+        x[3*i+1] = I0(0,1)/x[3*i];
+        x[3*i+2] = sqrt(I0.determinant())/x[3*i];
+    }
     
     // Solve the optimization problem using alglib
     //    alglib::mincgcreate(x, state);
@@ -229,7 +229,7 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
     std::vector<T> tripletList;
     if(_itr_times%100 == 0)
     {
-        std::ofstream outfile("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/L_list_cylinder_1.dat",std::ios::trunc);
+        std::ofstream outfile("../../benchmarks/TestModels/L_list_cylinder.dat",std::ios::trunc);
         outfile<<x.length()<<"\n";
         for(int i=0;i<x.length()-1;i++)
         {
@@ -483,7 +483,7 @@ void FindFirstFundamentalCoef::test_func_grad()
 {
     double YoungsModulus = 1e5;
     double PossionRatio = 0.3;
-    double thickness = 1e-1;
+    double thickness = 1e-2;
     
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
