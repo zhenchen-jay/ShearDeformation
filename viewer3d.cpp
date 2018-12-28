@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
   //op->compute_deformed_surface(V, F);
 
     reset();
-    igl::readOBJ(tar_prob + "/hypar.obj", V, F);
+    igl::readOBJ(tar_prob + "/cylinder.obj", V, F);
     // op->add_noise();
 //    for(int i=0;i<IT_NUM;i++)
 //    {

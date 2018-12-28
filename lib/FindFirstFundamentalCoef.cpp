@@ -11,6 +11,8 @@
 #include "MeshConnection.h"
 #include "ShellEnergyStandard.h"
 
+typedef Eigen::Triplet<double> T;
+
 // TO DO: Calculate the second derivative and use newton method to solve this problem
 
 void callback_func_coef(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df, void* ptr)
@@ -27,11 +29,11 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
         set_up(VD, F0, YoungsModulus, PoissonRatio, thickness);
     }
     alglib::real_1d_array x;
-    double epsg = 0;
+    double epsg = 1e-6;
     double epsf = 0;
     double epsx = 0;
     double stpmax = 0;
-    alglib::ae_int_t maxits = 10000;
+    alglib::ae_int_t maxits = 1e6;
     //    alglib::mincgstate state;
     //    alglib::mincgreport rep;
     alglib::minlbfgsstate state;
@@ -42,15 +44,26 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     Eigen::MatrixXi F_int;
     
     igl::readOBJ("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/rect.obj", V_int, F_int);
-    for(int i=0;i<F.rows();i++)
+    std::ifstream infile("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/L_list_cylinder_1.dat");
+    if(!infile)
+        return;
+    int num;
+    infile >> num;
+    double d;
+    for(int i=0;i<num;i++)
     {
-        Eigen::Matrix2d I0;
-        V_int = 0.5*V_int + 0.5*V;
-        GeoFeature::calculate_first_fundamental_form(V_int.row(F_int(i,0)),V_int.row(F_int(i,1)),V_int.row(F_int(i,2)),I0);
-        x[3*i] = sqrt(I0(0,0));
-        x[3*i+1] = I0(0,1)/x[3*i];
-        x[3*i+2] = sqrt(I0.determinant())/x[3*i];
+        infile >> d;
+        x[i] = d;
     }
+//    for(int i=0;i<F.rows();i++)
+//    {
+//        Eigen::Matrix2d I0;
+//        V_int = V;
+//        GeoFeature::calculate_first_fundamental_form(V_int.row(F_int(i,0)),V_int.row(F_int(i,1)),V_int.row(F_int(i,2)),I0);
+//        x[3*i] = sqrt(I0(0,0));
+//        x[3*i+1] = I0(0,1)/x[3*i];
+//        x[3*i+2] = sqrt(I0.determinant())/x[3*i];
+//    }
     
     // Solve the optimization problem using alglib
     //    alglib::mincgcreate(x, state);
@@ -213,9 +226,11 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
 void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, double &f, alglib::real_1d_array &df)
 {
     _itr_times++;
+    std::vector<T> tripletList;
     if(_itr_times%100 == 0)
     {
-        std::ofstream outfile("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/L_list_saddle.dat",std::ios::trunc);
+        std::ofstream outfile("/Users/chenzhen/UT/Research/Projects/ShearDeformation/benchmarks/TestModels/L_list_cylinder_1.dat",std::ios::trunc);
+        outfile<<x.length()<<"\n";
         for(int i=0;i<x.length()-1;i++)
         {
             outfile<<std::setprecision(16)<<x[i]<<"\n";
@@ -359,7 +374,8 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
                     result += 1.0*_thickness/4.0*_alpha*(IU_list[f].inverse()*ID_list[f]-Id).trace() * (IU_list[f].inverse()*dI[r]).trace()*diff_sqrt_det[c]*0.5;
                     result += 0.5*_thickness*_beta*(dIU_inv[c]*ID_list[f]*IU_list[f].inverse()*dI[r] + (IU_list[f].inverse()*ID_list[f]-Id)*dIU_inv[c]*dI[r]).trace()*sqrt(IU_list[f].determinant())*0.5;
                     result += 0.5*_thickness*_beta*( (IU_list[f].inverse()*ID_list[f]-Id)*IU_list[f].inverse()*dI[r] ).trace()*diff_sqrt_det[c]*0.5;
-                    grad_vec_f.coeffRef(3*i+r,3*f+c) += result;
+                    //grad_vec_f.coeffRef(3*i+r,3*f+c) += result;
+                    tripletList.push_back(T(3*i+r,3*f+c,result));
                 }
             }
         }
@@ -389,7 +405,8 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
                     result += 1.0*pow(_thickness,3.0)/12.0*_alpha*(IU_list[f].inverse()*IID_list[f]).trace() * (IU_list[f].inverse()*dII[r]).trace()*diff_sqrt_det[c]*0.5;
                     result += 1.0*pow(_thickness,3.0)/6.0*_beta*(dIU_inv[c]*IID_list[f]*IU_list[f].inverse()*dII[r] + (IU_list[f].inverse()*IID_list[f])*dIU_inv[c]*dII[r]).trace()*sqrt(IU_list[f].determinant())*0.5;
                     result += 1.0*pow(_thickness,3.0)/6.0*_beta*( (IU_list[f].inverse()*IID_list[f])*IU_list[f].inverse()*dII[r] ).trace()*diff_sqrt_det[c]*0.5;
-                    grad_vec_f.coeffRef(3*i+r,3*f+c) += result;
+                    //grad_vec_f.coeffRef(3*i+r,3*f+c) += result;
+                    tripletList.push_back(T(3*i+r,3*f+c,result));
                 }
             }
 
@@ -408,7 +425,8 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
                         result += 1.0*pow(_thickness,3.0)/12.0*_alpha*(IU_list[fa].inverse()*IID_list[fa]).trace() * (IU_list[fa].inverse()*dII[r]).trace()*diff_sqrt_det[c]*0.5;
                         result += 1.0*pow(_thickness,3.0)/6.0*_beta*(dIU_inv[c]*IID_list[fa]*IU_list[fa].inverse()*dII[r] + (IU_list[fa].inverse()*IID_list[fa])*dIU_inv[c]*dII[r]).trace()*sqrt(IU_list[fa].determinant())*0.5;
                         result += 1.0*pow(_thickness,3.0)/6.0*_beta*( (IU_list[fa].inverse()*IID_list[fa])*IU_list[fa].inverse()*dII[r] ).trace()*diff_sqrt_det[c]*0.5;
-                        grad_vec_f.coeffRef(3*i+r,3*fa+c) += result;
+                        //grad_vec_f.coeffRef(3*i+r,3*fa+c) += result;
+                        tripletList.push_back(T(3*i+r,3*fa+c,result));
                     }
                 }
                 adj_count++;
@@ -416,6 +434,7 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
         }
         
     }
+    grad_vec_f.setFromTriplets(tripletList.begin(), tripletList.end());
     Eigen::VectorXd gradf = grad_vec_f.transpose()*vec_f;
     for(int i=0;i<df.length();i++)
     {
@@ -464,7 +483,7 @@ void FindFirstFundamentalCoef::test_func_grad()
 {
     double YoungsModulus = 1e5;
     double PossionRatio = 0.3;
-    double thickness = 1e-4;
+    double thickness = 1e-1;
     
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;

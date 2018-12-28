@@ -19,8 +19,6 @@ void ShellEnergyMatrixI::streching_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0,
     if(L_list.size() != 3*F.rows())
     {
         std::cout<<"Please load the required coefficient first!"<<std::endl;
-        for(int i=0;i<L_list.size();i++)
-            std::cout<<L_list[i]<<std::endl;
         return;
     }
     double alpha = YoungsModulus*PossionRatio/((1+PossionRatio)*(1-2.0
