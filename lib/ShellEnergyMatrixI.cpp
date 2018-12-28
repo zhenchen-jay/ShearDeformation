@@ -38,13 +38,13 @@ void ShellEnergyMatrixI::streching_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0,
     // Calculate the energy
     for(int i=0;i<F.rows();i++)
     {
-        Eigen::Matrix2d I_D, I_U, I;
+        Eigen::Matrix2d I_D, I_U, I0;
         GeoFeature::calculate_first_fundamental_form(V.row(F(i,0)),V.row(F(i,1)),V.row(F(i,2)),I_D);
         GeoFeature::calculate_first_fundamental_form(V0.row(F(i,0)),V0.row(F(i,1)),V0.row(F(i,2)),I_U);
-        I << L_list[3*i],0,
+        I0 << L_list[3*i],0,
         L_list[3*i+1],L_list[3*i+2];
-        I = I*I.transpose();
-        I_U = (1-_ratio)*I_U + _ratio * I;
+        I0 = I0*I0.transpose();
+        I_U = (1-_ratio)*I_U + _ratio * I0;
         double dA = sqrt(I_U.determinant())/2.0; // 1/2 is the area of the parametric space
         dA_list.push_back(dA);
         IU_list.push_back(I_U);
@@ -112,12 +112,12 @@ void ShellEnergyMatrixI::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, E
     // Calculate the energy
     for(int i=0;i<F.rows();i++)
     {
-        Eigen::Matrix2d I_U, II_U, II_D, I;
+        Eigen::Matrix2d I_U, II_U, II_D, I0;
         GeoFeature::calculate_first_fundamental_form(V0.row(F(i,0)),V0.row(F(i,1)),V0.row(F(i,2)),I_U);
-        I << L_list[3*i],0,
+        I0 << L_list[3*i],0,
         L_list[3*i+1],L_list[3*i+2];
-        I = I*I.transpose();
-        I_U = (1-_ratio)*I_U + _ratio * I;
+        I0 = I0*I0.transpose();
+        I_U = (1-_ratio)*I_U + _ratio * I0;
         double dA = sqrt(I_U.determinant())/2.0; // 1/2 is the area of the parametric space
         dA_list.push_back(dA);
         IU_list.push_back(I_U);
