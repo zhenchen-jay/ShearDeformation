@@ -23,6 +23,7 @@ find_path(LIBIGL_INCLUDE_DIR igl/readOBJ.h
         /usr
         /usr/local
         /usr/local/igl/libigl
+        /Users/chenzhen/UT/Research/Projects/Tools/libigl
     PATH_SUFFIXES include
 )
 
@@ -32,5 +33,5 @@ find_package_handle_standard_args(LIBIGL
     LIBIGL_INCLUDE_DIR)
 mark_as_advanced(LIBIGL_INCLUDE_DIR)
 
-list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../shared/cmake")
+list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
 include(libigl)

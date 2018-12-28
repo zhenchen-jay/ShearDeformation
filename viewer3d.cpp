@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     viewer.plugins.push_back(&menu);
 
     // Add content to the default menu window
-    menu.draw_viewer_menu_func = [&]()
+    menu.callback_draw_viewer_menu = [&]()
     {
         // Draw parent menu content
         menu.draw_viewer_menu();
