@@ -33,7 +33,7 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     double epsf = 0;
     double epsx = 0;
     double stpmax = 0;
-    alglib::ae_int_t maxits = 1e6;
+    alglib::ae_int_t maxits = 1e4;
     //    alglib::mincgstate state;
     //    alglib::mincgreport rep;
     alglib::minlbfgsstate state;
@@ -44,7 +44,7 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     Eigen::MatrixXi F_int;
     
     igl::readOBJ("../../benchmarks/TestModels/rect.obj", V_int, F_int);
-//    std::ifstream infile("../../benchmarks/TestModels/L_list_cylinder_1.dat");
+//    std::ifstream infile("../../benchmarks/TestModels/L_list_cylinder.dat");
 //    if(!infile)
 //        return;
 //    int num;
@@ -229,7 +229,7 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
     std::vector<T> tripletList;
     if(_itr_times%100 == 0)
     {
-        std::ofstream outfile("../../benchmarks/TestModels/L_list_cylinder.dat",std::ios::trunc);
+        std::ofstream outfile("../../benchmarks/TestModels/L_list_sphere.dat",std::ios::trunc);
         outfile<<x.length()<<"\n";
         for(int i=0;i<x.length()-1;i++)
         {

@@ -96,17 +96,17 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix, const std::st
     Eigen::MatrixXi F1;
     igl::readOBJ(tar_shape + "/cylinder.obj", V, F1);
     auto op = std::make_unique<FindFirstFundamentalCoef>();
-//    op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
-//    Eigen::VectorXd sol;
-//    op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
-//    std::ofstream outfile(tar_shape+"/L_list_sphere.dat",std::ios::trunc);
-//    outfile<<sol.size()<<"\n";
-//    for(int i=0;i<sol.size()-1;i++)
-//    {
-//        outfile<<std::setprecision(16)<<sol(i)<<"\n";
-//    }
-//    outfile<<std::setprecision(16)<<sol(sol.size()-1);
-//    outfile.close();
+    op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
+    Eigen::VectorXd sol;
+    op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
+    std::ofstream outfile(tar_shape+"/L_list_cylinder.dat",std::ios::trunc);
+    outfile<<sol.size()<<"\n";
+    for(int i=0;i<sol.size()-1;i++)
+    {
+        outfile<<std::setprecision(16)<<sol(i)<<"\n";
+    }
+    outfile<<std::setprecision(16)<<sol(sol.size()-1);
+    outfile.close();
     _is_initialized = true;
     
     return true;
@@ -226,7 +226,6 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
 //    }
     std::cout<<"Streching: "<<E_streching<<"  Bending: "<<E_bending<<std::endl;
     std::cout<<"Streching Gradient: "<<diff_f_streching.norm()<<"  Bending Gradient: "<<diff_f_bending.norm()<<std::endl;
-    std::cout<<"Total Gradient: "<<(diff_f_streching+diff_f_bending).norm()<<std::endl;
 //    std::cout<<(diff_f_external).norm()<<std::endl;
 }
 

@@ -139,11 +139,14 @@ void ShellEnergyMatrixI::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, E
         
         GeoFeature::calculate_second_fundamental_form(V.row(F(i,0)), V.row(F(i,1)), V.row(F(i,2)), adjacent_points[0], adjacent_points[1], adjacent_points[2], real_pts, II_D);
         GeoFeature::calculate_second_fundamental_form(V0.row(F(i,0)), V0.row(F(i,1)), V0.row(F(i,2)), adjacent_points_U[0], adjacent_points_U[1], adjacent_points_U[2], real_pts, II_U);
+//        II_U << 0,0,
+//        0,0;
         
         IIU_list.push_back(II_U); //II_U = 0 when the undeformed shape is a plane
         IID_list.push_back(II_D);
         
         Eigen::Matrix2d Q = I_U.inverse()*(II_D-II_U);
+        
         
         E+=1.0/12.0 * pow(thickness,3) * dA * (alpha*0.5*(Q.trace()*Q.trace())+beta*(Q*Q).trace());
     }
