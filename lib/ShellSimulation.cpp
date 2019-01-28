@@ -87,26 +87,26 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix, const std::st
     mfs >> _thickness;
     mfs >> _YoungsModulus;
     mfs >> _PoissonsRatio;
-    _thickness = 1e-2;
     if (!mfs)
         return false;
     ratio = 0;
     
     Eigen::MatrixXd V;
     Eigen::MatrixXi F1;
-    igl::readOBJ(tar_shape + "/cylinder.obj", V, F1);
+    igl::readOBJ(tar_shape + "/sphere.obj", V, F1);
     auto op = std::make_unique<FindFirstFundamentalCoef>();
-//    op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
-//    Eigen::VectorXd sol;
-//    op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
-//    std::ofstream outfile(tar_shape+"/L_list_sphere.dat",std::ios::trunc);
-//    outfile<<sol.size()<<"\n";
-//    for(int i=0;i<sol.size()-1;i++)
-//    {
-//        outfile<<std::setprecision(16)<<sol(i)<<"\n";
-//    }
-//    outfile<<std::setprecision(16)<<sol(sol.size()-1);
-//    outfile.close();
+    op->test_func_grad();
+    op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
+    Eigen::VectorXd sol;
+    op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
+    std::ofstream outfile(tar_shape+"/L_list_sphere_1.dat",std::ios::trunc);
+    outfile<<sol.size()<<"\n";
+    for(int i=0;i<sol.size()-1;i++)
+    {
+        outfile<<std::setprecision(16)<<sol(i)<<"\n";
+    }
+    outfile<<std::setprecision(16)<<sol(sol.size()-1);
+    outfile.close();
     _is_initialized = true;
     
     return true;

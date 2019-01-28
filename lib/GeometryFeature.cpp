@@ -17,6 +17,7 @@ void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vect
         return;
     }
     nf = ((V1-V0).cross(V2-V0)).normalized();
+//    nf = ((V1-V0).cross(V2-V0));
     Eigen::Matrix3d W;
     W << 1,0,0,
     0,1,0,
@@ -43,6 +44,8 @@ void GeoFeature::face_normal(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vect
     for(int i=0;i<3;i++)
     {
         dn[i] = nf.dot(W.row(i)) * 1.0 / A * e.cross(nf);
+//        Eigen::Vector3d normalized_nf = nf.normalized();
+//        dn[i] = normalized_nf.dot(W.row(i)) * e.cross(normalized_nf);
     }
     
 }
@@ -102,7 +105,7 @@ void GeoFeature::diff_first_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d
 
 void GeoFeature::calculate_second_fundamental_form(Eigen::Vector3d V0, Eigen::Vector3d V1, Eigen::Vector3d V2, Eigen::Vector3d V_0, Eigen::Vector3d V_1, Eigen::Vector3d V_2, std::vector<bool> real_pts, Eigen::Matrix2d &II)
 {
-    Eigen::Vector3d nf = ((V1-V0).cross(V2-V0)).normalized();
+    Eigen::Vector3d nf = ((V1-V0).cross(V2-V0));
     Eigen::Vector3d nf0, nf1, nf2;
     nf0.setZero();
     nf1.setZero();

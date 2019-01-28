@@ -11,8 +11,7 @@
 
 void ShellEnergyStandard::streching_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::MatrixXi F, double YoungsModulus, double PossionRatio, double thickness, double &E, Eigen::VectorXd &dE)
 {
-    double alpha = YoungsModulus*PossionRatio/((1+PossionRatio)*(1-2.0
-                                                                   *PossionRatio));
+    double alpha = YoungsModulus*PossionRatio/((1+PossionRatio)*(1-PossionRatio));
     double beta = YoungsModulus/(2.0*(1+PossionRatio));
     E = 0;
     std::vector<std::vector<int> > VF;  // list of lists of incident faces (adjacency list)
@@ -68,8 +67,7 @@ void ShellEnergyStandard::streching_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0
 
 void ShellEnergyStandard::bending_energy(Eigen::MatrixXd V, Eigen::MatrixXd V0, Eigen::MatrixXi F, double YoungsModulus, double PossionRatio, double thickness, double &E, Eigen::VectorXd &dE)
 {
-    double alpha = YoungsModulus*PossionRatio/((1+PossionRatio)*(1-2.0
-                                                                   *PossionRatio));
+    double alpha = YoungsModulus*PossionRatio/((1+PossionRatio)*(1-PossionRatio));
     double beta = YoungsModulus/(2.0*(1+PossionRatio));
     E = 0;
     std::vector<std::vector<int> > VF;  // list of lists of incident faces (adjacency list)

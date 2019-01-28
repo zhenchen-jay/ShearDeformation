@@ -58,7 +58,7 @@ void FindFirstFundamentalCoef::compute_first_fundamental_form(Eigen::MatrixXd VD
     for(int i=0;i<F.rows();i++)
     {
         Eigen::Matrix2d I0;
-        V_int = V;
+       // V_int = V;
         GeoFeature::calculate_first_fundamental_form(V_int.row(F_int(i,0)),V_int.row(F_int(i,1)),V_int.row(F_int(i,2)),I0);
         x[3*i] = sqrt(I0(0,0));
         x[3*i+1] = I0(0,1)/x[3*i];
@@ -93,8 +93,7 @@ void FindFirstFundamentalCoef::set_up(Eigen::MatrixXd VD, Eigen::MatrixXi F0, do
     _YoungsModulus = YoungsModulus;
     _PoissonsRatio = PoissonRatio;
     _thickness = thickness;
-    _alpha = _YoungsModulus*_PoissonsRatio/((1+_PoissonsRatio)*(1-2.0
-                                                                *_PoissonsRatio));
+    _alpha = _YoungsModulus*_PoissonsRatio/((1+_PoissonsRatio)*(1-_PoissonsRatio));
     _beta = _YoungsModulus/(2.0*(1+_PoissonsRatio));
     if(!_is_initialized)
     {
@@ -229,7 +228,7 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
     std::vector<T> tripletList;
     if(_itr_times%100 == 0)
     {
-        std::ofstream outfile("../../benchmarks/TestModels/L_list_sphere.dat",std::ios::trunc);
+        std::ofstream outfile("../../benchmarks/TestModels/L_list_sphere_1.dat",std::ios::trunc);
         outfile<<x.length()<<"\n";
         for(int i=0;i<x.length()-1;i++)
         {
@@ -297,9 +296,9 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
                 (0.5 * _alpha * Q.trace() * dQ[k].trace() +
                  _beta * (Q * dQ[k]).trace());
             }
+
         }
     }
-    
     //std::cout<<"First Fundamental form finished!"<<std::endl;
     std::vector<int> index(3);
     std::vector<Eigen::Vector3d> adjacent_points(3);
@@ -346,6 +345,7 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
     //std::cout<<"Second fundamental form finished"<<std::endl;
     f = 1.0/2*vec_f.transpose()*vec_f;
     
+    
     // Get the gradient
     //std::cout<<"Get the gradient"<<std::endl;
     Eigen::SparseMatrix<double> grad_vec_f(vec_f.size(),3*F.rows());
@@ -371,8 +371,11 @@ void FindFirstFundamentalCoef::get_func_grad(const alglib::real_1d_array &x, dou
                     double result = 0;
                     dI[r] << dID_list[i][3*j+r];
                     result += 1.0*_thickness/4.0*_alpha*( (dIU_inv[c]*ID_list[f]).trace() * (IU_list[f].inverse()*dI[r]).trace() + (IU_list[f].inverse()*ID_list[f]-Id).trace() * (dIU_inv[c]*dI[r]).trace() ) * sqrt(IU_list[f].determinant())*0.5;
-                    result += 1.0*_thickness/4.0*_alpha*(IU_list[f].inverse()*ID_list[f]-Id).trace() * (IU_list[f].inverse()*dI[r]).trace()*diff_sqrt_det[c]*0.5;
+                    
                     result += 0.5*_thickness*_beta*(dIU_inv[c]*ID_list[f]*IU_list[f].inverse()*dI[r] + (IU_list[f].inverse()*ID_list[f]-Id)*dIU_inv[c]*dI[r]).trace()*sqrt(IU_list[f].determinant())*0.5;
+                
+                    
+                    result += 1.0*_thickness/4.0*_alpha*(IU_list[f].inverse()*ID_list[f]-Id).trace() * (IU_list[f].inverse()*dI[r]).trace()*diff_sqrt_det[c]*0.5;
                     result += 0.5*_thickness*_beta*( (IU_list[f].inverse()*ID_list[f]-Id)*IU_list[f].inverse()*dI[r] ).trace()*diff_sqrt_det[c]*0.5;
                     //grad_vec_f.coeffRef(3*i+r,3*f+c) += result;
                     tripletList.push_back(T(3*i+r,3*f+c,result));
@@ -483,16 +486,16 @@ void FindFirstFundamentalCoef::test_func_grad()
 {
     double YoungsModulus = 1e5;
     double PossionRatio = 0.3;
-    double thickness = 1e-2;
+    double thickness = 0.1;
     
     Eigen::MatrixXd V0, V;
     Eigen::MatrixXi F0, F;
     
-    igl::readOBJ("../../benchmarks/TestModels/rect.obj", V0, F0);
-    igl::readOBJ("../../benchmarks/TestModels/sphere.obj", V, F);
+//    igl::readOBJ("../../benchmarks/TestModels/rect.obj", V0, F0);
+//    igl::readOBJ("../../benchmarks/TestModels/sphere.obj", V, F);
     
-//    igl::readOBJ("../../benchmarks/TestModels/test_square.obj", V0,F0);
-//    igl::readOBJ("../../benchmarks/TestModels/test_square_bended.obj", V,F);
+    igl::readOBJ("../../benchmarks/TestModels/test_square.obj", V0,F0);
+    igl::readOBJ("../../benchmarks/TestModels/test_square_bended.obj", V,F);
     double E, E1,E2,E3;
     Eigen::VectorXd dE(F.rows()*3),dE2,dE3;
     alglib::real_1d_array alg_x,alg_x1,alg_df, alg_df1;
@@ -527,6 +530,7 @@ void FindFirstFundamentalCoef::test_func_grad()
     op->bending_energy(V, V0, F, YoungsModulus, PossionRatio, thickness, E3, dE3);
     dE2=dE2 + dE3;
     E2 = E2 + E3;
+    std::cout<<E2<<std::endl;
     //std::cout<<0.5*dE2.transpose()*dE2<<" "<<E<<std::endl;
     srand((unsigned)time(NULL));
     int selected_i = rand()%(F.rows()*3);
