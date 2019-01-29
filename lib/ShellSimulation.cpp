@@ -87,19 +87,19 @@ bool ShellSimulation::set_up_simulation(const std::string &prefix, const std::st
     mfs >> _thickness;
     mfs >> _YoungsModulus;
     mfs >> _PoissonsRatio;
+    _thickness = 1e-2;
     if (!mfs)
         return false;
     ratio = 0;
     
     Eigen::MatrixXd V;
     Eigen::MatrixXi F1;
-    igl::readOBJ(tar_shape + "/sphere.obj", V, F1);
+    igl::readOBJ(tar_shape + "/cylinder.obj", V, F1);
     auto op = std::make_unique<FindFirstFundamentalCoef>();
-    op->test_func_grad();
     op->set_up(V, F1, _YoungsModulus, _PoissonsRatio, _thickness);
     Eigen::VectorXd sol;
     op->compute_first_fundamental_form(V, F1, sol, _YoungsModulus, _PoissonsRatio, _thickness);
-    std::ofstream outfile(tar_shape+"/L_list_sphere_1.dat",std::ios::trunc);
+    std::ofstream outfile(tar_shape+"/L_list_cylinder.dat",std::ios::trunc);
     outfile<<sol.size()<<"\n";
     for(int i=0;i<sol.size()-1;i++)
     {
@@ -226,7 +226,6 @@ void ShellSimulation::energy_func_grad(const alglib::real_1d_array &x, double &f
 //    }
     std::cout<<"Streching: "<<E_streching<<"  Bending: "<<E_bending<<std::endl;
     std::cout<<"Streching Gradient: "<<diff_f_streching.norm()<<"  Bending Gradient: "<<diff_f_bending.norm()<<std::endl;
-    std::cout<<"Total Gradient: "<<(diff_f_streching+diff_f_bending).norm()<<std::endl;
 //    std::cout<<(diff_f_external).norm()<<std::endl;
 }
 
